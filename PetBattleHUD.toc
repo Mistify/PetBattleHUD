@@ -5,5 +5,5 @@
 ## Notes: A Pet Battle Heads Up Display Frame
 ## OptionalDeps: Tukui, ElvUI, AsphyxiaUI, DuffedUI
 
-TukuiPetBattleHUD.lua
+PetBattleHUD.lua
 

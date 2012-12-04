@@ -477,6 +477,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 			end
 		end
 	end)
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end)
 
 SLASH_PBHUD1, SLASH_PBHUD2 = '/PBH', '/pbh'

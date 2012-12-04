@@ -19,7 +19,7 @@ TukuiPetBattleHUD_Pet1:SetScript("OnDragStart", function(self) self:StartMoving(
 TukuiPetBattleHUD_Pet1:SetScript("OnDragStop", function(self) self:StopMovingOrSizing()  end)
 TukuiPetBattleHUD_Pet1:Size(250, 60)
 TukuiPetBattleHUD_Pet1:CreateBackdrop("Transparent")
-TukuiPetBattleHUD_Pet1:Point("CENTER", UIParent, "CENTER", 0, 200)
+TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 300)
 TukuiPetBattleHUD_Pet1NameText = TukuiPetBattleHUD_Pet1:CreateFontString(nil, "OVERLAY")
 TukuiPetBattleHUD_Pet1NameText:SetFont(font, fontsize, fontflag)
 TukuiPetBattleHUD_Pet1NameText:SetPoint("TOPLEFT", TukuiPetBattleHUD_Pet1, "TOPLEFT", 56, -5)
@@ -201,12 +201,12 @@ TukuiPetBattleHUD_EnemyPet1:SetScript("OnShow", function()
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 1)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
 	if not ownedString then
-		TukuiPetBattleHUD_EnemyPet1.backdrop:SetBackdropBorderColor(0.68,0.14,0.14)
+		TukuiPetBattleHUD_EnemyPet1.backdrop:SetBackdropBorderColor(1,0,0)
 	else
 		TukuiPetBattleHUD_EnemyPet1.backdrop:SetBackdropBorderColor(unpack(border))
 	end
 end)
-TukuiPetBattleHUD_EnemyPet1:Point("CENTER", UIParent, "CENTER", 0, 200)
+TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 300)
 TukuiPetBattleHUD_EnemyPet1NameText = TukuiPetBattleHUD_EnemyPet1:CreateFontString(nil, "OVERLAY")
 TukuiPetBattleHUD_EnemyPet1NameText:SetFont(font, fontsize, fontflag)
 TukuiPetBattleHUD_EnemyPet1NameText:SetPoint("TOPRIGHT", TukuiPetBattleHUD_EnemyPet1, "TOPRIGHT", -56, -5)
@@ -268,7 +268,7 @@ TukuiPetBattleHUD_EnemyPet2:SetScript("OnShow", function()
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 2)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
 	if not ownedString then
-		TukuiPetBattleHUD_EnemyPet2.backdrop:SetBackdropBorderColor(0.68,0.14,0.14)
+		TukuiPetBattleHUD_EnemyPet2.backdrop:SetBackdropBorderColor(1,0,0)
 	else
 		TukuiPetBattleHUD_EnemyPet2.backdrop:SetBackdropBorderColor(unpack(border))
 	end
@@ -334,7 +334,7 @@ TukuiPetBattleHUD_EnemyPet3:SetScript("OnShow", function()
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 3)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
 	if not ownedString then
-		TukuiPetBattleHUD_EnemyPet3.backdrop:SetBackdropBorderColor(0.68,0.14,0.14)
+		TukuiPetBattleHUD_EnemyPet3.backdrop:SetBackdropBorderColor(1,0,0)
 	else
 		TukuiPetBattleHUD_EnemyPet3.backdrop:SetBackdropBorderColor(unpack(border))
 	end
@@ -391,7 +391,15 @@ TukuiPetBattleHUD_EnemyPet3AtkSpeedIconText = TukuiPetBattleHUD_EnemyPet3Health:
 TukuiPetBattleHUD_EnemyPet3AtkSpeedIconText:SetFont(font, fontsize, fontflag)
 TukuiPetBattleHUD_EnemyPet3AtkSpeedIconText:SetPoint("RIGHT", TukuiPetBattleHUD_EnemyPet3Experience.backdrop, "LEFT", -18, 0)
 --
-TukuiPetBattleHUD = CreateFrame("Frame")
+PetBattleFrame:HookScript("OnShow", function() TukuiPetBattleHUD_Pet1:Show() end)
+PetBattleFrame:HookScript("OnHide", function()
+	TukuiPetBattleHUD_Pet1:Hide()
+	TukuiPetBattleHUD_EnemyPet1:Hide()
+	TukuiPetBattleHUD_EnemyPet2:Hide()
+	TukuiPetBattleHUD_EnemyPet3:Hide()
+end)
+TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
+TukuiPetBattleHUD:SetPoint("CENTER")
 TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
 TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 	self:SetScript("OnUpdate", function()
@@ -467,56 +475,5 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				_G["TukuiPetBattleHUD_Pet"..i.."HealthText"]:SetText(hp.." / "..maxhp)
 			end
 		end
-
 	end)
 end)
-local function GetPetDumpList(targetID)
-	local returned = nil
-
-	for i=1,C_PetJournal.GetNumPets(false) do 
-		id,speciesID,_,_,_,_,_,n,_,_,_,d=C_PetJournal.GetPetInfoByIndex(i)
-		
-		if speciesID == targetID then
-			if returned == nil then
-				returned = C_PetJournal.GetBattlePetLink(id)
-			else
-				returned = returned..", "..C_PetJournal.GetBattlePetLink(id)
-			end
-		end
-	end
-	
-	return returned
-end
-local function PetDump()
-	local isWildPetBattle = (C_PetBattles.IsInBattle() and C_PetBattles.IsWildBattle())
-
-	if (isWildPetBattle) then 
-		local activePet = C_PetBattles.GetActivePet(LE_BATTLE_PET_ENEMY)
-		local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, activePet)
-		
-		PetBattlePetDumpActive = GetPetDumpList(targetID)
-		if PetBattlePetDumpCompare == nil then PetBattlePetDumpCompare = GetPetDumpList(targetID) end
-		if PetBattlePetDumpActive ~= PetBattlePetDumpCompare then PetBattlePetDumpActive = GetPetDumpList(targetID) PetBattlePetDumpCompare = GetPetDumpList(targetID) PetBattlePetDumpedOnce = nil end
-			if PetBattlePetDumpedOnce == nil then
-				if PetBattlePetDumpActive == nil then
-					RaidNotice_AddMessage(RaidWarningFrame, "You do not own this pet.", ChatTypeInfo["RAID_WARNING"])
-					PetBattlePetDumpedOnce = true
-				else
-					RaidNotice_AddMessage(RaidWarningFrame, "Owned: "..PetBattlePetDumpActive, ChatTypeInfo["RAID_WARNING"])
-					PetBattlePetDumpedOnce = true
-				end
-			end
-	end
-end
-local PetBattlePetDump = CreateFrame("Frame")
-PetBattlePetDump:RegisterEvent("PET_BATTLE_PET_CHANGED")
-PetBattlePetDump:RegisterEvent("PET_BATTLE_CLOSE")
-PetBattlePetDump:SetScript("OnEvent", function(self,event)
-	if event == "PET_BATTLE_PET_CHANGED" then
-		PetDump()
-	elseif event == "PET_BATTLE_CLOSE" then
-		PetBattlePetDumpedOnce = nil
-		PetBattlePetDumpCompare = nil
-	end
-end)
-hooksecurefunc("PetBattleFrame_Display", PetDump)

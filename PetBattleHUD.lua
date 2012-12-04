@@ -4,7 +4,7 @@ if ElvUI then
 	font, fontsize, fontflag = E["media"].normFont, 12, "OUTLINE"
 	normtex = E["media"].normTex
 else
-	font, fontsize, fontflag = C["media"].pixelfont, fontsize, fontflag
+	font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
 	normtex = C["media"].normTex
 end
 

@@ -434,3 +434,53 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 		end
 	end)
 end)
+local function GetPetDumpList(targetID)
+	local returned = nil
+
+	for i=1,C_PetJournal.GetNumPets(false) do 
+		id,speciesID,_,_,_,_,_,n,_,_,_,d=C_PetJournal.GetPetInfoByIndex(i)
+		
+		if speciesID == targetID then
+			if returned == nil then
+				returned = C_PetJournal.GetBattlePetLink(id)
+			else
+				returned = returned..", "..C_PetJournal.GetBattlePetLink(id)
+			end
+		end
+	end
+	
+	return returned
+end
+local function PetDump()
+	local isWildPetBattle = (C_PetBattles.IsInBattle() and C_PetBattles.IsWildBattle())
+
+	if (isWildPetBattle) then 
+		local activePet = C_PetBattles.GetActivePet(LE_BATTLE_PET_ENEMY)
+		local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, activePet)
+		
+		PetBattlePetDumpActive = GetPetDumpList(targetID)
+		if PetBattlePetDumpCompare == nil then PetBattlePetDumpCompare = GetPetDumpList(targetID) end
+		if PetBattlePetDumpActive ~= PetBattlePetDumpCompare then PetBattlePetDumpActive = GetPetDumpList(targetID) PetBattlePetDumpCompare = GetPetDumpList(targetID) PetBattlePetDumpedOnce = nil end
+			if PetBattlePetDumpedOnce == nil then
+				if PetBattlePetDumpActive == nil then
+					RaidNotice_AddMessage(RaidWarningFrame, "You do not own this pet.", ChatTypeInfo["RAID_WARNING"])
+					PetBattlePetDumpedOnce = true
+				else
+					RaidNotice_AddMessage(RaidWarningFrame, "Owned: "..PetBattlePetDumpActive, ChatTypeInfo["RAID_WARNING"])
+					PetBattlePetDumpedOnce = true
+				end
+			end
+	end
+end
+local PetBattlePetDump = CreateFrame("Frame")
+PetBattlePetDump:RegisterEvent("PET_BATTLE_PET_CHANGED")
+PetBattlePetDump:RegisterEvent("PET_BATTLE_CLOSE")
+PetBattlePetDump:SetScript("OnEvent", function(self,event)
+	if event == "PET_BATTLE_PET_CHANGED" then
+		PetDump()
+	elseif event == "PET_BATTLE_CLOSE" then
+		PetBattlePetDumpedOnce = nil
+		PetBattlePetDumpCompare = nil
+	end
+end)
+hooksecurefunc("PetBattleFrame_Display", PetDump)

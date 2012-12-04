@@ -398,6 +398,7 @@ PetBattleFrame:HookScript("OnHide", function()
 	TukuiPetBattleHUD_EnemyPet2:Hide()
 	TukuiPetBattleHUD_EnemyPet3:Hide()
 end)
+
 TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD:SetPoint("CENTER")
 TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -477,3 +478,12 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 		end
 	end)
 end)
+
+SLASH_PBHUD1, SLASH_PBHUD2 = '/PBH', '/pbh'
+function SlashCmdList.PBHUD(msg, editbox)
+	if TukuiPetBattleHUD_Pet1:IsShown() then
+		TukuiPetBattleHUD_Pet1:Hide()
+	else
+		TukuiPetBattleHUD_Pet1:Show()
+	end
+end

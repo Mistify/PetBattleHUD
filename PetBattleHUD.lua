@@ -443,11 +443,18 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 		if ElvUI then
 			font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
 			normtex = A["media"].normTex
-			border = A["media"]["bordercolor"]
 		else
 			font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
+			if AsphyxiaUI then
+				if( A.client == "ruRU" ) then
+					font = C["media"]["pixelfont_ru"]
+					fontsize = 12
+				else
+					font = C["media"]["asphyxia"]
+					fontsize = 10
+				end
+			end
 			normtex = C["media"].normTex
-			border = C["media"]["bordercolor"]
 		end
 		for i = 1, 3 do
 			local petID = C_PetJournal.GetPetLoadOutInfo(i)

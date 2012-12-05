@@ -1,10 +1,19 @@
-local E, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
+local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
 local font, fontsize, fontflag
 if ElvUI then
-	font, fontsize, fontflag = E["media"].normFont, 12, "OUTLINE"
-	border = E["media"]["bordercolor"]
+	font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
+	border = A["media"]["bordercolor"]
 else
 	font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
+	if AsphyxiaUI then
+		if( A.client == "ruRU" ) then
+			font = C["media"]["pixelfont_ru"]
+			fontsize = 12
+		else
+			font = C["media"]["asphyxia"]
+			fontsize = 10
+		end
+	end
 	border = C["media"]["bordercolor"]
 end
 
@@ -432,9 +441,9 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 	if PBHShow then TukuiPetBattleHUD_Pet1:Show() end
 	self:SetScript("OnUpdate", function()
 		if ElvUI then
-			font, fontsize, fontflag = E["media"].normFont, 12, "OUTLINE"
-			normtex = E["media"].normTex
-			border = E["media"]["bordercolor"]
+			font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
+			normtex = A["media"].normTex
+			border = A["media"]["bordercolor"]
 		else
 			font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
 			normtex = C["media"].normTex

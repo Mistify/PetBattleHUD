@@ -1,5 +1,5 @@
 local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
-local font, fontsize, fontflag
+local font, fontsize, fontflag, border
 if ElvUI then
 	font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
 	border = A["media"]["bordercolor"]
@@ -24,7 +24,7 @@ TukuiPetBattleHUD_Pet1:EnableMouse(true)
 TukuiPetBattleHUD_Pet1:RegisterForDrag("LeftButton")
 TukuiPetBattleHUD_Pet1:SetScript("OnDragStart", function(self) if IsShiftKeyDown() then self:StartMoving() end end)
 TukuiPetBattleHUD_Pet1:SetScript("OnDragStop", function(self) self:StopMovingOrSizing()  end)
-TukuiPetBattleHUD_Pet1:Size(250, 60)
+TukuiPetBattleHUD_Pet1:Size(260, 60)
 TukuiPetBattleHUD_Pet1:CreateBackdrop("Transparent")
 TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 300)
 
@@ -73,7 +73,7 @@ TukuiPetBattleHUD_Pet1AtkSpeedIconText:SetPoint("LEFT", TukuiPetBattleHUD_Pet1Ex
 
 local TukuiPetBattleHUD_Pet2 = CreateFrame("Frame", "TukuiPetBattleHUD_Pet2", TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD_Pet2:Hide()
-TukuiPetBattleHUD_Pet2:Size(250, 60)
+TukuiPetBattleHUD_Pet2:Size(260, 60)
 TukuiPetBattleHUD_Pet2:CreateBackdrop("Transparent")
 TukuiPetBattleHUD_Pet2:Point("TOP", TukuiPetBattleHUD_Pet1, "BOTTOM", 0, -6)
 
@@ -120,7 +120,7 @@ TukuiPetBattleHUD_Pet2AtkSpeedIconText:SetPoint("LEFT", TukuiPetBattleHUD_Pet2Ex
 
 local TukuiPetBattleHUD_Pet3 = CreateFrame("Frame", "TukuiPetBattleHUD_Pet3", TukuiPetBattleHUD_Pet2)
 TukuiPetBattleHUD_Pet3:Hide()
-TukuiPetBattleHUD_Pet3:Size(250, 60)
+TukuiPetBattleHUD_Pet3:Size(260, 60)
 TukuiPetBattleHUD_Pet3:CreateBackdrop("Transparent")
 TukuiPetBattleHUD_Pet3:Point("TOP", TukuiPetBattleHUD_Pet2, "BOTTOM", 0, -6)
 
@@ -174,7 +174,7 @@ TukuiPetBattleHUD_EnemyPet1:EnableMouse(true)
 TukuiPetBattleHUD_EnemyPet1:RegisterForDrag("LeftButton")
 TukuiPetBattleHUD_EnemyPet1:SetScript("OnDragStart", function(self) if IsShiftKeyDown() then self:StartMoving() end end)
 TukuiPetBattleHUD_EnemyPet1:SetScript("OnDragStop", function(self) self:StopMovingOrSizing()  end)
-TukuiPetBattleHUD_EnemyPet1:Size(250, 60)
+TukuiPetBattleHUD_EnemyPet1:Size(260, 60)
 TukuiPetBattleHUD_EnemyPet1:CreateBackdrop("Transparent")
 TukuiPetBattleHUD_EnemyPet1:SetScript("OnShow", function()
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 1)
@@ -199,13 +199,13 @@ TukuiPetBattleHUD_EnemyPet1IconBackdrop:SetScript("OnEnter", function(self,...)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
 	GameTooltip:AddLine(ownedString)
 	for i=1,C_PetJournal.GetNumPets(false) do 
-		id,speciesID,_,_,level,_,_,n,_,_,_,d=C_PetJournal.GetPetInfoByIndex(i)
+		local petID, speciesID, _, _, level, _, _, _, _, petType, _, _, _, _, _, _, _ = C_PetJournal.GetPetInfoByIndex(i)
 		
 		if speciesID == targetID then
-			local _, maxHealth, power, speed = C_PetJournal.GetPetStats(id)
-			if C_PetJournal.GetBattlePetLink(id) then
+			local _, maxHealth, power, speed = C_PetJournal.GetPetStats(petID)
+			if C_PetJournal.GetBattlePetLink(petID) then
 				GameTooltip:AddLine(" ")
-				GameTooltip:AddLine(C_PetJournal.GetBattlePetLink(id))
+				GameTooltip:AddLine(C_PetJournal.GetBattlePetLink(petID))
 				GameTooltip:AddLine("Level "..level.."|r", 1, 1, 1)
 				GameTooltip:AddLine(maxHealth, 1, 1, 1)
 				GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
@@ -258,7 +258,7 @@ TukuiPetBattleHUD_EnemyPet1AtkSpeedIconText:SetPoint("RIGHT", TukuiPetBattleHUD_
 
 local TukuiPetBattleHUD_EnemyPet2 = CreateFrame("Frame", "TukuiPetBattleHUD_EnemyPet2", TukuiPetBattleHUD_EnemyPet1)
 TukuiPetBattleHUD_EnemyPet2:Hide()
-TukuiPetBattleHUD_EnemyPet2:Size(250, 60)
+TukuiPetBattleHUD_EnemyPet2:Size(260, 60)
 TukuiPetBattleHUD_EnemyPet2:CreateBackdrop("Transparent")
 TukuiPetBattleHUD_EnemyPet2:Point("TOP", TukuiPetBattleHUD_EnemyPet1, "BOTTOM", 0, -6)
 TukuiPetBattleHUD_EnemyPet2:SetScript("OnShow", function()
@@ -285,12 +285,12 @@ TukuiPetBattleHUD_EnemyPet2IconBackdrop:SetScript("OnEnter", function(self,...)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
 	GameTooltip:AddLine(ownedString)
 	for i=1,C_PetJournal.GetNumPets(false) do 
-		id,speciesID,_,_,level,_,_,n,_,_,_,d=C_PetJournal.GetPetInfoByIndex(i)
+		local petID, speciesID, _, _, level, _, _, _, _, petType, _, _, _, _, _, _, _ = C_PetJournal.GetPetInfoByIndex(i)
 		
 		if speciesID == targetID then
-			local _, maxHealth, power, speed = C_PetJournal.GetPetStats(id)
-			if C_PetJournal.GetBattlePetLink(id) then
-				GameTooltip:AddLine(C_PetJournal.GetBattlePetLink(id))
+			local _, maxHealth, power, speed = C_PetJournal.GetPetStats(petID)
+			if C_PetJournal.GetBattlePetLink(petID) then
+				GameTooltip:AddLine(C_PetJournal.GetBattlePetLink(petID))
 				GameTooltip:AddLine("Level "..level.."|r", 1, 1, 1)
 				GameTooltip:AddLine(maxHealth, 1, 1, 1)
 				GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
@@ -343,7 +343,7 @@ TukuiPetBattleHUD_EnemyPet2AtkSpeedIconText:SetPoint("RIGHT", TukuiPetBattleHUD_
 
 local TukuiPetBattleHUD_EnemyPet3 = CreateFrame("Frame", "TukuiPetBattleHUD_EnemyPet3", TukuiPetBattleHUD_EnemyPet2)
 TukuiPetBattleHUD_EnemyPet3:Hide()
-TukuiPetBattleHUD_EnemyPet3:Size(250, 60)
+TukuiPetBattleHUD_EnemyPet3:Size(260, 60)
 TukuiPetBattleHUD_EnemyPet3:CreateBackdrop("Transparent")
 TukuiPetBattleHUD_EnemyPet3:Point("TOP", TukuiPetBattleHUD_EnemyPet2, "BOTTOM", 0, -6)
 TukuiPetBattleHUD_EnemyPet3:SetScript("OnShow", function()
@@ -370,12 +370,12 @@ TukuiPetBattleHUD_EnemyPet3IconBackdrop:SetScript("OnEnter", function(self,...)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
 	GameTooltip:AddLine(ownedString)
 	for i=1,C_PetJournal.GetNumPets(false) do 
-		id,speciesID,_,_,level,_,_,n,_,_,_,d=C_PetJournal.GetPetInfoByIndex(i)
+		local petID, speciesID, _, _, level, _, _, _, _, petType, _, _, _, _, _, _, _ = C_PetJournal.GetPetInfoByIndex(i)
 		
 		if speciesID == targetID then
-			local _, maxHealth, power, speed = C_PetJournal.GetPetStats(id)
-			if C_PetJournal.GetBattlePetLink(id) then
-				GameTooltip:AddLine(C_PetJournal.GetBattlePetLink(id))
+			local _, maxHealth, power, speed = C_PetJournal.GetPetStats(petID)
+			if C_PetJournal.GetBattlePetLink(petID) then
+				GameTooltip:AddLine(C_PetJournal.GetBattlePetLink(petID))
 				GameTooltip:AddLine("Level "..level.."|r", 1, 1, 1)
 				GameTooltip:AddLine(maxHealth, 1, 1, 1)
 				GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
@@ -440,6 +440,7 @@ TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
 TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 	if PBHShow then TukuiPetBattleHUD_Pet1:Show() end
 	self:SetScript("OnUpdate", function()
+		local font, fontsize, fontflag
 		if ElvUI then
 			font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
 			normtex = A["media"].normTex
@@ -552,6 +553,17 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 		end
 	end)
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+end)
+
+PetBattleHUDCombatDetect = CreateFrame("Frame")
+PetBattleHUDCombatDetect:RegisterEvent("PLAYER_REGEN_DISABLED")
+PetBattleHUDCombatDetect:RegisterEvent("PLAYER_REGEN_ENABLED")
+PetBattleHUDCombatDetect:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_REGEN_DISABLED" or InCombatLockdown() then
+		TukuiPetBattleHUD_Pet1:Hide()
+	else
+		TukuiPetBattleHUD_Pet1:Show()
+	end
 end)
 
 SLASH_PBHUD1, SLASH_PBHUD2 = '/PBH', '/pbh'

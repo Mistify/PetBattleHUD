@@ -4,6 +4,7 @@
 ## Version: 1.03
 ## Notes: A Pet Battle Heads Up Display Frame
 ## OptionalDeps: Tukui, ElvUI, AsphyxiaUI, DuffedUI
+## SavedVariables: PBHShow
 
 PetBattleHUD.lua
 

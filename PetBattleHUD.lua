@@ -419,16 +419,17 @@ TukuiPetBattleHUD_EnemyPet3AtkSpeedIconText:SetPoint("RIGHT", TukuiPetBattleHUD_
 --
 PetBattleFrame:HookScript("OnShow", function() TukuiPetBattleHUD_Pet1:Show() end)
 PetBattleFrame:HookScript("OnHide", function()
-	TukuiPetBattleHUD_Pet1:Hide()
-	TukuiPetBattleHUD_EnemyPet1:Hide()
-	TukuiPetBattleHUD_EnemyPet2:Hide()
-	TukuiPetBattleHUD_EnemyPet3:Hide()
+	if not PBHShow then
+		TukuiPetBattleHUD_Pet1:Hide()
+		TukuiPetBattleHUD_EnemyPet1:Hide()
+	end
 end)
 
 TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD:SetPoint("CENTER")
 TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
 TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
+	if PBHShow then TukuiPetBattleHUD_Pet1:Show() end
 	self:SetScript("OnUpdate", function()
 		if ElvUI then
 			font, fontsize, fontflag = E["media"].normFont, 12, "OUTLINE"
@@ -541,7 +542,9 @@ SLASH_PBHUD1, SLASH_PBHUD2 = '/PBH', '/pbh'
 function SlashCmdList.PBHUD(msg, editbox)
 	if TukuiPetBattleHUD_Pet1:IsShown() then
 		TukuiPetBattleHUD_Pet1:Hide()
+		PBHShow = nil
 	else
 		TukuiPetBattleHUD_Pet1:Show()
+		PBHShow = true
 	end
 end

@@ -1,19 +1,8 @@
 local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
-local font, fontsize, fontflag, border
+local border
 if ElvUI then
-	font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
 	border = A["media"]["bordercolor"]
 else
-	font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
-	if AsphyxiaUI then
-		if( A.client == "ruRU" ) then
-			font = C["media"]["pixelfont_ru"]
-			fontsize = 12
-		else
-			font = C["media"]["asphyxia"]
-			fontsize = 10
-		end
-	end
 	border = C["media"]["bordercolor"]
 end
 
@@ -59,7 +48,6 @@ TukuiPetBattleHUD_Pet1AtkPowerIcon:SetTexture("Interface\\AddOns\\PetBattleHUD\\
 TukuiPetBattleHUD_Pet1AtkPowerIcon:Size(16)
 TukuiPetBattleHUD_Pet1AtkPowerIcon:SetPoint("TOPLEFT", TukuiPetBattleHUD_Pet1Health.backdrop, "RIGHT", 2, 8)
 TukuiPetBattleHUD_Pet1AtkPowerIconText = TukuiPetBattleHUD_Pet1Health:CreateFontString(nil, "OVERLAY")
-TukuiPetBattleHUD_Pet1AtkPowerIconText:SetFont(font, fontsize, fontflag)
 TukuiPetBattleHUD_Pet1AtkPowerIconText:SetPoint("LEFT", TukuiPetBattleHUD_Pet1Health.backdrop, "RIGHT", 20, 2)
 TukuiPetBattleHUD_Pet1NameText = TukuiPetBattleHUD_Pet1:CreateFontString(nil, "OVERLAY")
 TukuiPetBattleHUD_Pet1NameText:SetPoint("BOTTOMLEFT", TukuiPetBattleHUD_Pet1Health.backdrop, "TOPLEFT", 2, 2)
@@ -213,6 +201,7 @@ TukuiPetBattleHUD_EnemyPet1IconBackdrop:SetPoint("RIGHT", TukuiPetBattleHUD_Enem
 TukuiPetBattleHUD_EnemyPet1IconBackdrop:CreateBackdrop()
 TukuiPetBattleHUD_EnemyPet1IconBackdrop:Size(40)
 TukuiPetBattleHUD_EnemyPet1IconBackdrop:SetScript("OnEnter", function(self,...)
+	print(self:GetParent())
 	GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT', 2, 4)
 	GameTooltip:ClearLines()
 
@@ -479,10 +468,67 @@ PetBattleFrame:HookScript("OnHide", function()
 	end
 end)
 
+function PlayerPetUpdate()
+	local font, fontsize, fontflag
+	if ElvUI then
+		font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
+		normtex = A["media"].normTex
+	else
+		font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
+		if AsphyxiaUI then
+			if( A.client == "ruRU" ) then
+				font = C["media"]["pixelfont_ru"]
+				fontsize = 12
+			else
+				font = C["media"]["asphyxia"]
+				fontsize = 10
+			end
+		end
+		normtex = C["media"].normTex
+	end
+	for i = 1, 3 do
+		local petID = C_PetJournal.GetPetLoadOutInfo(i)
+		if petID == nil then return end
+		local _, customName, level, xp, maxXp, _, _, name, icon, petType = C_PetJournal.GetPetInfoByPetID(C_PetJournal.GetPetLoadOutInfo(i))
+		local hp, maxhp, power, speed, rarity = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(i))
+		local r, g, b = GetItemQualityColor(rarity-1)
+		_G["TukuiPetBattleHUD_Pet"..i]:Show()
+		_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetFont(font, fontsize, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetText(customName or name)
+		_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetTextColor(r, g, b)
+		_G["TukuiPetBattleHUD_Pet"..i.."IconBackdrop"].backdrop:SetBackdropBorderColor(r,g,b)
+		_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropTexture"]:SetTexture(icon)
+		_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropText"]:SetFont(font, fontsize, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropText"]:SetText(level)
+		_G["TukuiPetBattleHUD_Pet"..i.."IconPetTypeTexture"]:SetTexture("Interface\\AddOns\\PetBattleHUD\\"..PET_TYPE_SUFFIX[petType])
+		_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetStatusBarTexture(normtex)
+		_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetStatusBarColor(0.11,0.66,0.11)
+		_G["TukuiPetBattleHUD_Pet"..i.."HealthText"]:SetFont(font, fontsize, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetStatusBarTexture(normtex)
+		_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetStatusBarColor(0.6,0,0.86)
+		_G["TukuiPetBattleHUD_Pet"..i.."ExperienceText"]:SetFont(font, fontsize, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetFont(font, fontsize, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetFont(font, fontsize, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetText(power)
+		_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetText(speed)
+		_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetTextColor(r, g, b)
+		_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetMinMaxValues(0, maxXp)
+		_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetValue(xp)
+		_G["TukuiPetBattleHUD_Pet"..i.."ExperienceText"]:SetText(xp.." / "..maxXp)
+		_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetMinMaxValues(0, maxhp)
+		_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetValue(hp)
+		_G["TukuiPetBattleHUD_Pet"..i.."HealthText"]:SetText(hp.." / "..maxhp)
+		TukuiPetBattleHUD_EnemyPet1:Hide()
+		TukuiPetBattleHUDInit = true
+	end
+end
+
 TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD:SetPoint("CENTER")
+TukuiPetBattleHUD:RegisterEvent("COMPANION_UPDATE")
 TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
 TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
+	if event == "PLAYER_ENTERING_WORLD" then
 	if PBHShow then TukuiPetBattleHUD_Pet1:Show() end
 	self:SetScript("OnUpdate", function()
 		local font, fontsize, fontflag
@@ -503,28 +549,14 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 			normtex = C["media"].normTex
 		end
 		for i = 1, 3 do
-			local petID = C_PetJournal.GetPetLoadOutInfo(i)
-			if petID == nil then return end
-			_G["TukuiPetBattleHUD_Pet"..i]:Show()
-			_, customName, level, xp, maxXp, _, _, name, icon, petType = C_PetJournal.GetPetInfoByPetID(C_PetJournal.GetPetLoadOutInfo(i))
-			local hp, maxhp, power, speed, rarity = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(i))
-			_G["TukuiPetBattleHUD_Pet"..i.."IconPetTypeTexture"]:SetTexture("Interface\\AddOns\\PetBattleHUD\\"..PET_TYPE_SUFFIX[petType])
-			local r, g, b = GetItemQualityColor(rarity-1)
-			_G["TukuiPetBattleHUD_Pet"..i.."IconBackdrop"].backdrop:SetBackdropBorderColor(r,g,b)
-			_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropTexture"]:SetTexture(icon)
-			_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetStatusBarTexture(normtex)
-			_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetStatusBarColor(0.11,0.66,0.11)
-			_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetStatusBarTexture(normtex)
-			_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetStatusBarColor(0.6,0,0.86)
-			_G["TukuiPetBattleHUD_Pet"..i.."HealthText"]:SetFont(font, fontsize, fontflag)
-			_G["TukuiPetBattleHUD_Pet"..i.."ExperienceText"]:SetFont(font, fontsize, fontflag)
-			_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetFont(font, fontsize, fontflag)
-			_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetFont(font, fontsize, fontflag)
-			_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetFont(font, fontsize, fontflag)
-			_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropText"]:SetFont(font, fontsize, fontflag)
-
-			_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropText"]:SetText(level)
+			if not TukuiPetBattleHUDInit then PlayerPetUpdate() end
 			if C_PetBattles.IsInBattle() then
+				local petID = C_PetJournal.GetPetLoadOutInfo(i)
+				if petID == nil then return end
+				local _, customName, level, xp, maxXp, _, _, name, icon, petType = C_PetJournal.GetPetInfoByPetID(C_PetJournal.GetPetLoadOutInfo(i))
+				local hp, maxhp, power, speed, rarity = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(i))
+				local r, g, b = GetItemQualityColor(rarity-1)
+				PetBattleFrameXPBar:Hide()
 				allyxp, allymaxXP = C_PetBattles.GetXP(LE_BATTLE_PET_ALLY, i)
 				enemyxp, enemymaxXP = C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)
 				enemylevel = C_PetBattles.GetLevel(LE_BATTLE_PET_ENEMY, i)
@@ -533,74 +565,56 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				enemyquality = C_PetBattles.GetBreedQuality(LE_BATTLE_PET_ENEMY, i)
 				local er, eg, eb = GetItemQualityColor(enemyquality-1)
 				local enemyframes = C_PetBattles.GetNumPets(LE_BATTLE_PET_ENEMY)
-				if enemyframes == 1 then
-					TukuiPetBattleHUD_EnemyPet1:Show()
-				elseif enemyframes == 2 then
-					TukuiPetBattleHUD_EnemyPet1:Show()
-					TukuiPetBattleHUD_EnemyPet2:Show()
-				elseif enemyframes == 3 then
-					TukuiPetBattleHUD_EnemyPet1:Show()
-					TukuiPetBattleHUD_EnemyPet2:Show()
-					TukuiPetBattleHUD_EnemyPet3:Show()
+				if not TukuiPetBattleHUD_EnemyPet1:IsShown() then
+					if enemyframes == 1 then
+						TukuiPetBattleHUD_EnemyPet1:Show()
+					elseif enemyframes == 2 then
+						TukuiPetBattleHUD_EnemyPet1:Show()
+						TukuiPetBattleHUD_EnemyPet2:Show()
+					elseif enemyframes == 3 then
+						TukuiPetBattleHUD_EnemyPet1:Show()
+						TukuiPetBattleHUD_EnemyPet2:Show()
+						TukuiPetBattleHUD_EnemyPet3:Show()
+					end
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconPetTypeTexture"]:SetTexture("Interface\\AddOns\\PetBattleHUD\\"..PET_TYPE_SUFFIX[enemytype])
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."HealthText"]:SetFont(font, fontsize, fontflag)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."ExperienceText"]:SetFont(font, fontsize, fontflag)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkPowerIconText"]:SetFont(font, fontsize, fontflag)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIconText"]:SetFont(font, fontsize, fontflag)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."NameText"]:SetFont(font, fontsize, fontflag)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropText"]:SetFont(font, fontsize, fontflag)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetStatusBarTexture(normtex)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetStatusBarColor(0.11,0.66,0.11)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetStatusBarTexture(normtex)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetStatusBarColor(0.6,0,0.86)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."NameText"]:SetText(C_PetBattles.GetName(LE_BATTLE_PET_ENEMY, i))
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."NameText"]:SetTextColor(er, eg, eb)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdrop"].backdrop:SetBackdropBorderColor(er, eg, eb)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetTexture(enemyicon)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropText"]:SetText(enemylevel)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetMinMaxValues(0, enemymaxXP)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetValue(enemyxp)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."ExperienceText"]:SetText(enemyxp.." / "..enemymaxXP)
 				end
-				_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetText(C_PetBattles.GetName(LE_BATTLE_PET_ALLY, i))
-				_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetTextColor(r, g, b)
 				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetMinMaxValues(0, C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ALLY, i))
 				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetValue(C_PetBattles.GetHealth(LE_BATTLE_PET_ALLY, i))
 				_G["TukuiPetBattleHUD_Pet"..i.."HealthText"]:SetText(C_PetBattles.GetHealth(LE_BATTLE_PET_ALLY, i).." / "..C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ALLY, i))
-				_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetMinMaxValues(0, allymaxXP)
-				_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetValue(allyxp)
-				_G["TukuiPetBattleHUD_Pet"..i.."ExperienceText"]:SetText(allyxp.." / "..allymaxXP)
 				_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetText(C_PetBattles.GetPower(LE_BATTLE_PET_ALLY, i))
 				_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetText(C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i))
 
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."IconPetTypeTexture"]:SetTexture("Interface\\AddOns\\PetBattleHUD\\"..PET_TYPE_SUFFIX[enemytype])
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."HealthText"]:SetFont(font, fontsize, fontflag)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."ExperienceText"]:SetFont(font, fontsize, fontflag)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkPowerIconText"]:SetFont(font, fontsize, fontflag)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIconText"]:SetFont(font, fontsize, fontflag)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."NameText"]:SetFont(font, fontsize, fontflag)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropText"]:SetFont(font, fontsize, fontflag)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetStatusBarTexture(normtex)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetStatusBarColor(0.11,0.66,0.11)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetStatusBarTexture(normtex)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetStatusBarColor(0.6,0,0.86)
-
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."NameText"]:SetText(C_PetBattles.GetName(LE_BATTLE_PET_ENEMY, i))
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."NameText"]:SetTextColor(er, eg, eb)
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetMinMaxValues(0, C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ENEMY, i))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetValue(C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."HealthText"]:SetText(C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i).." / "..C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ENEMY, i))
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetMinMaxValues(0, enemymaxXP)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetValue(enemyxp)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."ExperienceText"]:SetText(enemyxp.." / "..enemymaxXP)
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkPowerIconText"]:SetText(C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, i))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIconText"]:SetText(C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, i))
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdrop"].backdrop:SetBackdropBorderColor(er, eg, eb)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetTexture(enemyicon)
-				_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropText"]:SetText(enemylevel)
-			else
-				TukuiPetBattleHUD_EnemyPet1:Hide()
-				TukuiPetBattleHUD_EnemyPet2:Hide()
-				TukuiPetBattleHUD_EnemyPet3:Hide()
-				if customName then
-					_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetText(customName)
-				else
-					_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetText(name)
-				end
-				_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetText(power)
-				_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetText(speed)
-				_G["TukuiPetBattleHUD_Pet"..i.."NameText"]:SetTextColor(r, g, b)
-				_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetMinMaxValues(0, maxXp)
-				_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetValue(xp)
-				_G["TukuiPetBattleHUD_Pet"..i.."ExperienceText"]:SetText(xp.." / "..maxXp)
-				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetMinMaxValues(0, maxhp)
-				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetValue(hp)
-				_G["TukuiPetBattleHUD_Pet"..i.."HealthText"]:SetText(hp.." / "..maxhp)
 			end
 		end
 	end)
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	end
+	if event == "COMPANION_UPDATE" then
+		PlayerPetUpdate()
+	end
 end)
 
 PetBattleHUDCombatDetect = CreateFrame("Frame")
@@ -624,3 +638,57 @@ function SlashCmdList.PBHUD(msg, editbox)
 		PBHShow = true
 	end
 end
+hooksecurefunc("PetBattleAuraHolder_Update", function(self)
+	if not self.petOwner or not self.petIndex then return end
+
+	local nextFrame = 1
+	for i=1, C_PetBattles.GetNumAuras(self.petOwner, self.petIndex) do
+		local auraID, instanceID, turnsRemaining, isBuff = C_PetBattles.GetAuraInfo(self.petOwner, self.petIndex, i)
+		if (isBuff and self.displayBuffs) or (not isBuff and self.displayDebuffs) then
+			local frame = self.frames[nextFrame]
+			if self.petOwner == LE_BATTLE_PET_ALLY then
+				hudframe = _G["TukuiPetBattleHUD_Pet"..i]
+			else
+				hudframe = _G["TukuiPetBattleHUD_EnemyPet"..i]
+			end
+			-- always hide the border
+			frame.DebuffBorder:Hide()
+
+			if not frame.isSkinned then
+				frame:CreateBackdrop()
+				frame.backdrop:SetOutside(frame.Icon)
+				frame.Icon:SetTexCoord(.1,.9,.1,.9)
+			end
+
+			if ( nextFrame == 1 ) then
+				frame:SetPoint("TOPLEFT", hudframe, "TOPRIGHT", -4, 0);
+			elseif ( (nextFrame - 1) % numPerRow == 0 ) then
+				frame:SetPoint("TOPLEFT", self.frames[nextFrame - numPerRow], "TOPRIGHT", -4, 0);
+			else
+				frame:SetPoint("TOPLEFT", self.frames[nextFrame - 1], "TOPRIGHT", -4, 0);
+	                end
+
+			if isBuff then
+				frame.backdrop:SetBackdropBorderColor(0, 1, 0)
+			else
+				frame.backdrop:SetBackdropBorderColor(1, 0, 0)
+			end
+			
+			if turnsRemaining > 0 then
+				frame.Duration:SetText(turnsRemaining)
+			end
+			
+			frame.Duration:SetFont(C.media.font, 14, "OUTLINE")
+			frame.Duration:ClearAllPoints()
+			frame.Duration:SetPoint("CENTER", frame.Icon, "CENTER", 1, 0)
+		
+			nextFrame = nextFrame + 1
+		end
+	end
+end)
+--[[
+ frame = self.frames[nextFrame];
+ 
+                --Anchor the new frame
+
+]]

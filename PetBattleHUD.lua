@@ -97,7 +97,7 @@ TukuiPetBattleHUD_Pet2IconBackdropTexture:SetInside(TukuiPetBattleHUD_Pet2IconBa
 
 local TukuiPetBattleHUD_Pet2IconPetType = CreateFrame("Frame", "TukuiPetBattleHUD_Pet2IconPetType", TukuiPetBattleHUD_Pet2IconBackdrop)
 TukuiPetBattleHUD_Pet2IconPetType:Size(32)
-TukuiPetBattleHUD_Pet2IconPetType:SetPoint("CENTER", TukuiPetBattleHUD_Pet2IconBackdrop, "TOPLEFT", -2, 4)
+TukuiPetBattleHUD_Pet2IconPetType:SetPoint("TOPRIGHT", TukuiPetBattleHUD_Pet2, "TOPRIGHT", 0, 0)
 
 local TukuiPetBattleHUD_Pet2IconPetTypeTexture = TukuiPetBattleHUD_Pet2IconPetType:CreateTexture("TukuiPetBattleHUD_Pet2IconPetTypeTexture", "OVERLAY")
 TukuiPetBattleHUD_Pet2IconPetTypeTexture:SetInside(TukuiPetBattleHUD_Pet2IconPetType)
@@ -151,7 +151,7 @@ TukuiPetBattleHUD_Pet3IconBackdropTexture:SetInside(TukuiPetBattleHUD_Pet3IconBa
 
 local TukuiPetBattleHUD_Pet3IconPetType = CreateFrame("Frame", "TukuiPetBattleHUD_Pet3IconPetType", TukuiPetBattleHUD_Pet3IconBackdrop)
 TukuiPetBattleHUD_Pet3IconPetType:Size(32)
-TukuiPetBattleHUD_Pet3IconPetType:SetPoint("CENTER", TukuiPetBattleHUD_Pet3IconBackdrop, "TOPLEFT", -2, 4)
+TukuiPetBattleHUD_Pet3IconPetType:SetPoint("TOPRIGHT", TukuiPetBattleHUD_Pet3, "TOPRIGHT", 0, 0)
 
 local TukuiPetBattleHUD_Pet3IconPetTypeTexture = TukuiPetBattleHUD_Pet3IconPetType:CreateTexture("TukuiPetBattleHUD_Pet3IconPetTypeTexture", "OVERLAY")
 TukuiPetBattleHUD_Pet3IconPetTypeTexture:SetInside(TukuiPetBattleHUD_Pet3IconPetType)
@@ -247,6 +247,13 @@ local TukuiPetBattleHUD_EnemyPet1IconBackdropTexture = TukuiPetBattleHUD_EnemyPe
 TukuiPetBattleHUD_EnemyPet1IconBackdropTexture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 TukuiPetBattleHUD_EnemyPet1IconBackdropTexture:SetInside(TukuiPetBattleHUD_EnemyPet1IconBackdrop.backdrop)
 
+local TukuiPetBattleHUD_EnemyPet1IconPetType = CreateFrame("Frame", "TukuiPetBattleHUD_EnemyPet1IconPetType", TukuiPetBattleHUD_EnemyPet1IconBackdrop)
+TukuiPetBattleHUD_EnemyPet1IconPetType:Size(32)
+TukuiPetBattleHUD_EnemyPet1IconPetType:SetPoint("TOPLEFT", TukuiPetBattleHUD_EnemyPet1, "TOPLEFT", 0, 0)
+
+local TukuiPetBattleHUD_EnemyPet1IconPetTypeTexture = TukuiPetBattleHUD_EnemyPet1IconPetType:CreateTexture("TukuiPetBattleHUD_EnemyPet1IconPetTypeTexture", "OVERLAY")
+TukuiPetBattleHUD_EnemyPet1IconPetTypeTexture:SetInside(TukuiPetBattleHUD_EnemyPet1IconPetType)
+
 local TukuiPetBattleHUD_EnemyPet1Health = CreateFrame('StatusBar', "TukuiPetBattleHUD_EnemyPet1Health", TukuiPetBattleHUD_EnemyPet1)
 TukuiPetBattleHUD_EnemyPet1Health:SetPoint("RIGHT", TukuiPetBattleHUD_EnemyPet1IconBackdrop.backdrop, "LEFT", -4, 0)
 TukuiPetBattleHUD_EnemyPet1Health:Size(150, 10)
@@ -290,8 +297,6 @@ TukuiPetBattleHUD_EnemyPet2:SetScript("OnShow", function()
 	if not ownedString then
 		TukuiPetBattleHUD_EnemyPet2.backdrop:SetBackdropBorderColor(1,0,0)
 	else
-		local _, _, _, _, quality = C_PetJournal.GetPetStats(targetID)
-		print(quality)
 		TukuiPetBattleHUD_EnemyPet2.backdrop:SetBackdropBorderColor(unpack(border))
 	end
 end)
@@ -313,6 +318,7 @@ TukuiPetBattleHUD_EnemyPet2IconBackdrop:SetScript("OnEnter", function(self,...)
 		if speciesID == targetID then
 			local _, maxHealth, power, speed = C_PetJournal.GetPetStats(petID)
 			if C_PetJournal.GetBattlePetLink(petID) then
+				GameTooltip:AddLine(" ")
 				GameTooltip:AddLine(C_PetJournal.GetBattlePetLink(petID))
 				GameTooltip:AddLine("Level "..level.."|r", 1, 1, 1)
 				GameTooltip:AddLine(maxHealth, 1, 1, 1)
@@ -329,6 +335,13 @@ end)
 TukuiPetBattleHUD_EnemyPet2IconBackdrop:SetScript("OnLeave", function(self,...) GameTooltip:Hide() end)
 TukuiPetBattleHUD_EnemyPet2IconBackdropText = TukuiPetBattleHUD_EnemyPet2IconBackdrop:CreateFontString(nil, "OVERLAY")
 TukuiPetBattleHUD_EnemyPet2IconBackdropText:SetPoint("BOTTOMLEFT", TukuiPetBattleHUD_EnemyPet2IconBackdrop.backdrop, "BOTTOMLEFT", 4, 2)
+
+local TukuiPetBattleHUD_EnemyPet2IconPetType = CreateFrame("Frame", "TukuiPetBattleHUD_EnemyPet2IconPetType", TukuiPetBattleHUD_EnemyPet2IconBackdrop)
+TukuiPetBattleHUD_EnemyPet2IconPetType:Size(32)
+TukuiPetBattleHUD_EnemyPet2IconPetType:SetPoint("TOPLEFT", TukuiPetBattleHUD_EnemyPet2, "TOPLEFT", 0, 0)
+
+local TukuiPetBattleHUD_EnemyPet2IconPetTypeTexture = TukuiPetBattleHUD_EnemyPet2IconPetType:CreateTexture("TukuiPetBattleHUD_EnemyPet2IconPetTypeTexture", "OVERLAY")
+TukuiPetBattleHUD_EnemyPet2IconPetTypeTexture:SetInside(TukuiPetBattleHUD_EnemyPet2IconPetType)
 
 local TukuiPetBattleHUD_EnemyPet2IconBackdropTexture = TukuiPetBattleHUD_EnemyPet2IconBackdrop:CreateTexture("TukuiPetBattleHUD_EnemyPet2IconBackdropTexture", "OVERLAY")
 TukuiPetBattleHUD_EnemyPet2IconBackdropTexture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
@@ -377,8 +390,6 @@ TukuiPetBattleHUD_EnemyPet3:SetScript("OnShow", function()
 	if not ownedString then
 		TukuiPetBattleHUD_EnemyPet3.backdrop:SetBackdropBorderColor(1,0,0)
 	else
-		local _, _, _, _, quality = C_PetJournal.GetPetStats(targetID)
-		print(quality)
 		TukuiPetBattleHUD_EnemyPet3.backdrop:SetBackdropBorderColor(unpack(border))
 	end
 end)
@@ -420,6 +431,13 @@ TukuiPetBattleHUD_EnemyPet3IconBackdropText:SetPoint("BOTTOMLEFT", TukuiPetBattl
 local TukuiPetBattleHUD_EnemyPet3IconBackdropTexture = TukuiPetBattleHUD_EnemyPet3IconBackdrop:CreateTexture("TukuiPetBattleHUD_EnemyPet3IconBackdropTexture", "OVERLAY")
 TukuiPetBattleHUD_EnemyPet3IconBackdropTexture:SetTexCoord(0.08, 0.92, 0.08, 0.92)
 TukuiPetBattleHUD_EnemyPet3IconBackdropTexture:SetInside(TukuiPetBattleHUD_EnemyPet3IconBackdrop.backdrop)
+
+local TukuiPetBattleHUD_EnemyPet3IconPetType = CreateFrame("Frame", "TukuiPetBattleHUD_EnemyPet3IconPetType", TukuiPetBattleHUD_EnemyPet3IconBackdrop)
+TukuiPetBattleHUD_EnemyPet3IconPetType:Size(32)
+TukuiPetBattleHUD_EnemyPet3IconPetType:SetPoint("TOPLEFT", TukuiPetBattleHUD_EnemyPet3, "TOPLEFT", 0, 0)
+
+local TukuiPetBattleHUD_EnemyPet3IconPetTypeTexture = TukuiPetBattleHUD_EnemyPet3IconPetType:CreateTexture("TukuiPetBattleHUD_EnemyPet3IconPetTypeTexture", "OVERLAY")
+TukuiPetBattleHUD_EnemyPet3IconPetTypeTexture:SetInside(TukuiPetBattleHUD_EnemyPet3IconPetType)
 
 local TukuiPetBattleHUD_EnemyPet3Health = CreateFrame('StatusBar', "TukuiPetBattleHUD_EnemyPet3Health", TukuiPetBattleHUD_EnemyPet3)
 TukuiPetBattleHUD_EnemyPet3Health:SetPoint("RIGHT", TukuiPetBattleHUD_EnemyPet3IconBackdrop.backdrop, "LEFT", -4, 0)
@@ -511,6 +529,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				enemyxp, enemymaxXP = C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)
 				enemylevel = C_PetBattles.GetLevel(LE_BATTLE_PET_ENEMY, i)
 				enemyicon = C_PetBattles.GetIcon(LE_BATTLE_PET_ENEMY, i)
+				enemytype = C_PetBattles.GetPetType(LE_BATTLE_PET_ENEMY, i)
 				enemyquality = C_PetBattles.GetBreedQuality(LE_BATTLE_PET_ENEMY, i)
 				local er, eg, eb = GetItemQualityColor(enemyquality-1)
 				local enemyframes = C_PetBattles.GetNumPets(LE_BATTLE_PET_ENEMY)
@@ -535,6 +554,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetText(C_PetBattles.GetPower(LE_BATTLE_PET_ALLY, i))
 				_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetText(C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i))
 
+				_G["TukuiPetBattleHUD_EnemyPet"..i.."IconPetTypeTexture"]:SetTexture("Interface\\AddOns\\PetBattleHUD\\"..PET_TYPE_SUFFIX[enemytype])
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."HealthText"]:SetFont(font, fontsize, fontflag)
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."ExperienceText"]:SetFont(font, fontsize, fontflag)
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkPowerIconText"]:SetFont(font, fontsize, fontflag)

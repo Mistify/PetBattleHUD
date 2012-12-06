@@ -15,6 +15,7 @@ TukuiPetBattleHUD_Pet1:SetScript("OnDragStart", function(self) if IsShiftKeyDown
 TukuiPetBattleHUD_Pet1:SetScript("OnDragStop", function(self) self:StopMovingOrSizing()  end)
 TukuiPetBattleHUD_Pet1:Size(260, 60)
 TukuiPetBattleHUD_Pet1:CreateBackdrop("Transparent")
+TukuiPetBattleHUD_Pet1.backdrop:CreateShadow()
 TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 300)
 
 local TukuiPetBattleHUD_Pet1IconBackdrop = CreateFrame("Frame", "TukuiPetBattleHUD_Pet1IconBackdrop", TukuiPetBattleHUD_Pet1)
@@ -70,7 +71,8 @@ local TukuiPetBattleHUD_Pet2 = CreateFrame("Frame", "TukuiPetBattleHUD_Pet2", Tu
 TukuiPetBattleHUD_Pet2:Hide()
 TukuiPetBattleHUD_Pet2:Size(260, 60)
 TukuiPetBattleHUD_Pet2:CreateBackdrop("Transparent")
-TukuiPetBattleHUD_Pet2:Point("TOP", TukuiPetBattleHUD_Pet1, "BOTTOM", 0, -6)
+TukuiPetBattleHUD_Pet2.backdrop:CreateShadow()
+TukuiPetBattleHUD_Pet2:Point("BOTTOM", TukuiPetBattleHUD_Pet1, "TOP", 0, 8)
 
 local TukuiPetBattleHUD_Pet2IconBackdrop = CreateFrame("Frame", "TukuiPetBattleHUD_Pet2IconBackdrop", TukuiPetBattleHUD_Pet2)
 TukuiPetBattleHUD_Pet2IconBackdrop:SetPoint("LEFT", TukuiPetBattleHUD_Pet2, "LEFT", 10, 0)
@@ -124,7 +126,8 @@ local TukuiPetBattleHUD_Pet3 = CreateFrame("Frame", "TukuiPetBattleHUD_Pet3", Tu
 TukuiPetBattleHUD_Pet3:Hide()
 TukuiPetBattleHUD_Pet3:Size(260, 60)
 TukuiPetBattleHUD_Pet3:CreateBackdrop("Transparent")
-TukuiPetBattleHUD_Pet3:Point("TOP", TukuiPetBattleHUD_Pet2, "BOTTOM", 0, -6)
+TukuiPetBattleHUD_Pet3.backdrop:CreateShadow()
+TukuiPetBattleHUD_Pet3:Point("BOTTOM", TukuiPetBattleHUD_Pet2, "TOP", 0, 8)
 
 local TukuiPetBattleHUD_Pet3IconBackdrop = CreateFrame("Frame", "TukuiPetBattleHUD_Pet3IconBackdrop", TukuiPetBattleHUD_Pet3)
 TukuiPetBattleHUD_Pet3IconBackdrop:SetPoint("LEFT", TukuiPetBattleHUD_Pet3, "LEFT", 10, 0)
@@ -185,6 +188,7 @@ TukuiPetBattleHUD_EnemyPet1:SetScript("OnDragStart", function(self) if IsShiftKe
 TukuiPetBattleHUD_EnemyPet1:SetScript("OnDragStop", function(self) self:StopMovingOrSizing()  end)
 TukuiPetBattleHUD_EnemyPet1:Size(260, 60)
 TukuiPetBattleHUD_EnemyPet1:CreateBackdrop("Transparent")
+TukuiPetBattleHUD_EnemyPet1.backdrop:CreateShadow()
 TukuiPetBattleHUD_EnemyPet1:SetScript("OnShow", function()
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 1)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
@@ -201,16 +205,14 @@ TukuiPetBattleHUD_EnemyPet1IconBackdrop:SetPoint("RIGHT", TukuiPetBattleHUD_Enem
 TukuiPetBattleHUD_EnemyPet1IconBackdrop:CreateBackdrop()
 TukuiPetBattleHUD_EnemyPet1IconBackdrop:Size(40)
 TukuiPetBattleHUD_EnemyPet1IconBackdrop:SetScript("OnEnter", function(self,...)
-	print(self:GetParent())
 	GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT', 2, 4)
 	GameTooltip:ClearLines()
-
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 1)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
-	GameTooltip:AddLine(ownedString)
+	if ownedString ~= nil then GameTooltip:AddLine(ownedString) end
 	for i=1,C_PetJournal.GetNumPets(false) do 
 		local petID, speciesID, _, _, level, _, _, _, _, petType, _, _, _, _, _, _, _ = C_PetJournal.GetPetInfoByIndex(i)
-		
+
 		if speciesID == targetID then
 			local _, maxHealth, power, speed = C_PetJournal.GetPetStats(petID)
 			if C_PetJournal.GetBattlePetLink(petID) then
@@ -279,7 +281,8 @@ local TukuiPetBattleHUD_EnemyPet2 = CreateFrame("Frame", "TukuiPetBattleHUD_Enem
 TukuiPetBattleHUD_EnemyPet2:Hide()
 TukuiPetBattleHUD_EnemyPet2:Size(260, 60)
 TukuiPetBattleHUD_EnemyPet2:CreateBackdrop("Transparent")
-TukuiPetBattleHUD_EnemyPet2:Point("TOP", TukuiPetBattleHUD_EnemyPet1, "BOTTOM", 0, -6)
+TukuiPetBattleHUD_EnemyPet2.backdrop:CreateShadow()
+TukuiPetBattleHUD_EnemyPet2:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet1, "TOP", 0, 8)
 TukuiPetBattleHUD_EnemyPet2:SetScript("OnShow", function()
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 2)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
@@ -300,7 +303,7 @@ TukuiPetBattleHUD_EnemyPet2IconBackdrop:SetScript("OnEnter", function(self,...)
 
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 2)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
-	GameTooltip:AddLine(ownedString)
+	if ownedString ~= nil then GameTooltip:AddLine(ownedString) end
 	for i=1,C_PetJournal.GetNumPets(false) do 
 		local petID, speciesID, _, _, level, _, _, _, _, petType, _, _, _, _, _, _, _ = C_PetJournal.GetPetInfoByIndex(i)
 		
@@ -372,7 +375,8 @@ local TukuiPetBattleHUD_EnemyPet3 = CreateFrame("Frame", "TukuiPetBattleHUD_Enem
 TukuiPetBattleHUD_EnemyPet3:Hide()
 TukuiPetBattleHUD_EnemyPet3:Size(260, 60)
 TukuiPetBattleHUD_EnemyPet3:CreateBackdrop("Transparent")
-TukuiPetBattleHUD_EnemyPet3:Point("TOP", TukuiPetBattleHUD_EnemyPet2, "BOTTOM", 0, -6)
+TukuiPetBattleHUD_EnemyPet3.backdrop:CreateShadow()
+TukuiPetBattleHUD_EnemyPet3:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet2, "TOP", 0, 8)
 TukuiPetBattleHUD_EnemyPet3:SetScript("OnShow", function()
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 3)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
@@ -393,7 +397,7 @@ TukuiPetBattleHUD_EnemyPet3IconBackdrop:SetScript("OnEnter", function(self,...)
 
 	local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, 3)
 	local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
-	GameTooltip:AddLine(ownedString)
+	if ownedString ~= nil then GameTooltip:AddLine(ownedString) end
 	for i=1,C_PetJournal.GetNumPets(false) do 
 		local petID, speciesID, _, _, level, _, _, _, _, petType, _, _, _, _, _, _, _ = C_PetJournal.GetPetInfoByIndex(i)
 		
@@ -666,6 +670,7 @@ function SlashCmdList.PBHUD(msg, editbox)
 		PBHShow = true
 	end
 end
+--[[ DO NOT ENABLE THIS UNLESS YOU KNOW WHAT THE HELL YOUR DOING
 hooksecurefunc("PetBattleAuraHolder_Update", function(self)
 	if not self.petOwner or not self.petIndex then return end
 
@@ -681,13 +686,6 @@ hooksecurefunc("PetBattleAuraHolder_Update", function(self)
 			end
 			-- always hide the border
 			frame.DebuffBorder:Hide()
-
-			if not frame.isSkinned then
-				frame:CreateBackdrop()
-				frame.backdrop:SetOutside(frame.Icon)
-				frame.Icon:SetTexCoord(.1,.9,.1,.9)
-			end
-
 			if ( nextFrame == 1 ) then
 				frame:SetPoint("TOPLEFT", hudframe, "TOPRIGHT", -4, 0);
 			elseif ( (nextFrame - 1) % numPerRow == 0 ) then
@@ -695,6 +693,12 @@ hooksecurefunc("PetBattleAuraHolder_Update", function(self)
 			else
 				frame:SetPoint("TOPLEFT", self.frames[nextFrame - 1], "TOPRIGHT", -4, 0);
 	                end
+
+			if not frame.isSkinned then
+				frame:CreateBackdrop()
+				frame.backdrop:SetOutside(frame.Icon)
+				frame.Icon:SetTexCoord(.1,.9,.1,.9)
+			end
 
 			if isBuff then
 				frame.backdrop:SetBackdropBorderColor(0, 1, 0)
@@ -714,9 +718,13 @@ hooksecurefunc("PetBattleAuraHolder_Update", function(self)
 		end
 	end
 end)
---[[
- frame = self.frames[nextFrame];
- 
-                --Anchor the new frame
 
+	PetBattleFrame.EnemyPadDebuffFrame:ClearAllPoints()
+	PetBattleFrame.EnemyPadBuffFrame:ClearAllPoints()
+	PetBattleFrame.AllyPadDebuffFrame:ClearAllPoints()
+	PetBattleFrame.AllyPadBuffFrame:ClearAllPoints()
+	PetBattleFrame.EnemyPadDebuffFrame:SetPoint("BOTTOMLEFT", TukuiPetBattleHUD_EnemyPet1, "BOTTOMRIGHT", -9, 0)
+	PetBattleFrame.EnemyPadBuffFrame:SetPoint("TOPLEFT", TukuiPetBattleHUD_EnemyPet1, "TOPRIGHT", -9, 0)
+	PetBattleFrame.AllyPadDebuffFrame:SetPoint("TOPRIGHT", TukuiPetBattleHUD_Pet1, "TOPLEFT", 8, 0)
+	PetBattleFrame.AllyPadBuffFrame:SetPoint("BOTTOMRIGHT", TukuiPetBattleHUD_Pet1, "BOTTOMLEFT", 8, 0)
 ]]

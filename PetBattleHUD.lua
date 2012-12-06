@@ -462,9 +462,10 @@ TukuiPetBattleHUD_EnemyPet3AtkSpeedIconText:SetPoint("RIGHT", TukuiPetBattleHUD_
 --
 PetBattleFrame:HookScript("OnShow", function() TukuiPetBattleHUD_Pet1:Show() end)
 PetBattleFrame:HookScript("OnHide", function()
+	TukuiPetBattleEnemyHUDInit = nil
+	TukuiPetBattleHUD_EnemyPet1:Hide()
 	if not PBHShow then
 		TukuiPetBattleHUD_Pet1:Hide()
-		TukuiPetBattleHUD_EnemyPet1:Hide()
 	end
 end)
 
@@ -590,7 +591,6 @@ function EnemyPetUpdate()
 		_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetValue(enemyhp)
 		_G["TukuiPetBattleHUD_EnemyPet"..i.."HealthText"]:SetText(enemyhp.." / "..enemymaxhp)
 		TukuiPetBattleEnemyHUDInit = true
-		print("Initializing Enemy Pet "..i)
 	end
 end
 

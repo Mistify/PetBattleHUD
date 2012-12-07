@@ -604,6 +604,7 @@ TukuiPetBattleHUD:RegisterEvent("COMPANION_UPDATE")
 TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
 TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 	if event == "PLAYER_ENTERING_WORLD" then
+	print("|cffC495DDTukui|r & |cff1784d1ElvUI |rPet Battle HUD by |cffD38D01Azilroka|r - Version: |cff1784d1"..GetAddOnMetadata("PetBattleHUD", "Version"))
 	if PBHShow then TukuiPetBattleHUD_Pet1:Show() end
 	self:SetScript("OnUpdate", function()
 		local font, fontsize, fontflag
@@ -658,7 +659,9 @@ PetBattleHUDCombatDetect:SetScript("OnEvent", function(self, event)
 	if event == "PLAYER_REGEN_DISABLED" or InCombatLockdown() then
 		TukuiPetBattleHUD_Pet1:Hide()
 	else
-		TukuiPetBattleHUD_Pet1:Show()
+		if PBHShow then
+			TukuiPetBattleHUD_Pet1:Show()
+		end
 	end
 end)
 

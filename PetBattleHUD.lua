@@ -645,7 +645,9 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	end
 	if event == "COMPANION_UPDATE" then
-		PlayerPetUpdate()
+		if TukuiPetBattleHUD_Pet1:IsShown() then
+			PlayerPetUpdate()
+		end
 	end
 end)
 

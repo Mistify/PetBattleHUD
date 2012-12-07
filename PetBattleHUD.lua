@@ -2,8 +2,11 @@ local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
 local border
 if ElvUI then
 	border = A["media"]["bordercolor"]
+	textoffset = 0
 else
 	border = C["media"]["bordercolor"]
+	textoffset = 0
+	if AsphyxiaUI then textoffset = 1 end
 end
 
 local TukuiPetBattleHUD_Pet1 = CreateFrame("Frame", "TukuiPetBattleHUD_Pet1", UIParent)
@@ -43,7 +46,7 @@ TukuiPetBattleHUD_Pet1Health:SetStatusBarColor(0.11,0.66,0.11)
 TukuiPetBattleHUD_Pet1Health:SetFrameLevel(TukuiPetBattleHUD_Pet1:GetFrameLevel() + 2)
 TukuiPetBattleHUD_Pet1Health:CreateBackdrop()
 TukuiPetBattleHUD_Pet1HealthText = TukuiPetBattleHUD_Pet1Health:CreateFontString(nil, "OVERLAY")
-TukuiPetBattleHUD_Pet1HealthText:SetPoint("CENTER", TukuiPetBattleHUD_Pet1Health.backdrop, "CENTER", 0, 0)
+TukuiPetBattleHUD_Pet1HealthText:SetPoint("CENTER", TukuiPetBattleHUD_Pet1Health.backdrop, "CENTER", 0, (0+textoffset))
 TukuiPetBattleHUD_Pet1AtkPowerIcon = TukuiPetBattleHUD_Pet1:CreateTexture(nil, "OVERLAY")
 TukuiPetBattleHUD_Pet1AtkPowerIcon:SetTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
 TukuiPetBattleHUD_Pet1AtkPowerIcon:Size(16)
@@ -59,7 +62,7 @@ TukuiPetBattleHUD_Pet1Experience:Size(150, 10)
 TukuiPetBattleHUD_Pet1Experience:SetFrameLevel(TukuiPetBattleHUD_Pet1:GetFrameLevel() + 2)
 TukuiPetBattleHUD_Pet1Experience:CreateBackdrop()
 TukuiPetBattleHUD_Pet1ExperienceText = TukuiPetBattleHUD_Pet1Experience:CreateFontString(nil, "OVERLAY")
-TukuiPetBattleHUD_Pet1ExperienceText:SetPoint("CENTER", TukuiPetBattleHUD_Pet1Experience.backdrop, "CENTER", 0, 0)
+TukuiPetBattleHUD_Pet1ExperienceText:SetPoint("CENTER", TukuiPetBattleHUD_Pet1Experience.backdrop, "CENTER", 0, (0+textoffset))
 TukuiPetBattleHUD_Pet1AtkSpeedIcon = TukuiPetBattleHUD_Pet1:CreateTexture("TukuiPetBattleHUD_Pet1AtkSpeedIcon", "OVERLAY")
 TukuiPetBattleHUD_Pet1AtkSpeedIcon:SetTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
 TukuiPetBattleHUD_Pet1AtkSpeedIcon:Size(16)
@@ -98,7 +101,7 @@ TukuiPetBattleHUD_Pet2Health:Size(150, 10)
 TukuiPetBattleHUD_Pet2Health:SetFrameLevel(TukuiPetBattleHUD_Pet2:GetFrameLevel() + 2)
 TukuiPetBattleHUD_Pet2Health:CreateBackdrop()
 TukuiPetBattleHUD_Pet2HealthText = TukuiPetBattleHUD_Pet2Health:CreateFontString(nil, "OVERLAY")
-TukuiPetBattleHUD_Pet2HealthText:SetPoint("CENTER", TukuiPetBattleHUD_Pet2Health, "CENTER", 0, 1)
+TukuiPetBattleHUD_Pet2HealthText:SetPoint("CENTER", TukuiPetBattleHUD_Pet2Health, "CENTER", 0, (1+textoffset))
 TukuiPetBattleHUD_Pet2AtkPowerIcon = TukuiPetBattleHUD_Pet2:CreateTexture("TukuiPetBattleHUD_Pet2AtkPowerIcon", "OVERLAY")
 TukuiPetBattleHUD_Pet2AtkPowerIcon:SetTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
 TukuiPetBattleHUD_Pet2AtkPowerIcon:Size(16)
@@ -114,7 +117,7 @@ TukuiPetBattleHUD_Pet2Experience:Size(150, 10)
 TukuiPetBattleHUD_Pet2Experience:SetFrameLevel(TukuiPetBattleHUD_Pet2:GetFrameLevel() + 2)
 TukuiPetBattleHUD_Pet2Experience:CreateBackdrop()
 TukuiPetBattleHUD_Pet2ExperienceText = TukuiPetBattleHUD_Pet2Experience:CreateFontString(nil, "OVERLAY")
-TukuiPetBattleHUD_Pet2ExperienceText:SetPoint("CENTER", TukuiPetBattleHUD_Pet2Experience.backdrop, "CENTER", 0, 1)
+TukuiPetBattleHUD_Pet2ExperienceText:SetPoint("CENTER", TukuiPetBattleHUD_Pet2Experience.backdrop, "CENTER", 0, (1+textoffset))
 TukuiPetBattleHUD_Pet2AtkSpeedIcon = TukuiPetBattleHUD_Pet2:CreateTexture("TukuiPetBattleHUD_Pet2AtkSpeedIcon", "OVERLAY")
 TukuiPetBattleHUD_Pet2AtkSpeedIcon:SetTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
 TukuiPetBattleHUD_Pet2AtkSpeedIcon:Size(16)
@@ -153,7 +156,7 @@ TukuiPetBattleHUD_Pet3Health:Size(150, 10)
 TukuiPetBattleHUD_Pet3Health:SetFrameLevel(TukuiPetBattleHUD_Pet3:GetFrameLevel() + 2)
 TukuiPetBattleHUD_Pet3Health:CreateBackdrop()
 TukuiPetBattleHUD_Pet3HealthText = TukuiPetBattleHUD_Pet3Health:CreateFontString(nil, "OVERLAY")
-TukuiPetBattleHUD_Pet3HealthText:SetPoint("CENTER", TukuiPetBattleHUD_Pet3Health, "CENTER", 0, 1)
+TukuiPetBattleHUD_Pet3HealthText:SetPoint("CENTER", TukuiPetBattleHUD_Pet3Health, "CENTER", 0, (1+textoffset))
 TukuiPetBattleHUD_Pet3AtkPowerIcon = TukuiPetBattleHUD_Pet3:CreateTexture("TukuiPetBattleHUD_Pet3AtkPowerIcon", "OVERLAY")
 TukuiPetBattleHUD_Pet3AtkPowerIcon:SetTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
 TukuiPetBattleHUD_Pet3AtkPowerIcon:Size(16)
@@ -169,7 +172,7 @@ TukuiPetBattleHUD_Pet3Experience:Size(150, 10)
 TukuiPetBattleHUD_Pet3Experience:SetFrameLevel(TukuiPetBattleHUD_Pet3:GetFrameLevel() + 2)
 TukuiPetBattleHUD_Pet3Experience:CreateBackdrop()
 TukuiPetBattleHUD_Pet3ExperienceText = TukuiPetBattleHUD_Pet3Experience:CreateFontString(nil, "OVERLAY")
-TukuiPetBattleHUD_Pet3ExperienceText:SetPoint("CENTER", TukuiPetBattleHUD_Pet3Experience.backdrop, "CENTER", 0, 1)
+TukuiPetBattleHUD_Pet3ExperienceText:SetPoint("CENTER", TukuiPetBattleHUD_Pet3Experience.backdrop, "CENTER", 0, (1+textoffset))
 TukuiPetBattleHUD_Pet3AtkSpeedIcon = TukuiPetBattleHUD_Pet3:CreateTexture("TukuiPetBattleHUD_Pet3AtkSpeedIcon", "OVERLAY")
 TukuiPetBattleHUD_Pet3AtkSpeedIcon:SetTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
 TukuiPetBattleHUD_Pet3AtkSpeedIcon:Size(16)
@@ -467,6 +470,8 @@ TukuiPetBattleHUD_EnemyPet3AtkSpeedIconText:SetPoint("RIGHT", TukuiPetBattleHUD_
 PetBattleFrame:HookScript("OnShow", function() TukuiPetBattleHUD_Pet1:Show() end)
 PetBattleFrame:HookScript("OnHide", function()
 	TukuiPetBattleEnemyHUDInit = nil
+	TukuiPetBattleHUD_EnemyPet3:Hide()
+	TukuiPetBattleHUD_EnemyPet2:Hide()
 	TukuiPetBattleHUD_EnemyPet1:Hide()
 	if not PBHShow then
 		TukuiPetBattleHUD_Pet1:Hide()
@@ -523,7 +528,6 @@ function PlayerPetUpdate()
 		_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetMinMaxValues(0, maxhp)
 		_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetValue(hp)
 		_G["TukuiPetBattleHUD_Pet"..i.."HealthText"]:SetText(hp.." / "..maxhp)
-		TukuiPetBattleHUD_EnemyPet1:Hide()
 		TukuiPetBattleHUDInit = true
 	end
 end

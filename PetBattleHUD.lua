@@ -468,10 +468,6 @@ TukuiPetBattleHUD_EnemyPet3AtkSpeedIconText:SetPoint("RIGHT", TukuiPetBattleHUD_
 --
 PetBattleFrame:HookScript("OnShow", function() TukuiPetBattleHUD_Pet1:Show() end)
 PetBattleFrame:HookScript("OnHide", function()
-	TukuiPetBattleEnemyHUDInit = nil
-	TukuiPetBattleHUD_EnemyPet3:Hide()
-	TukuiPetBattleHUD_EnemyPet2:Hide()
-	TukuiPetBattleHUD_EnemyPet1:Hide()
 	if not PBHShow then
 		TukuiPetBattleHUD_Pet1:Hide()
 	end
@@ -532,6 +528,7 @@ function PlayerPetUpdate()
 end
 
 function EnemyPetUpdate()
+	TukuiPetBattleHUD_EnemyPet1:Hide()
 	local font, fontsize, fontflag
 	if ElvUI then
 		font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
@@ -605,6 +602,9 @@ TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD:SetPoint("CENTER")
 TukuiPetBattleHUD:RegisterEvent("COMPANION_UPDATE")
 TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
+TukuiPetBattleHUD:RegisterEvent("BATTLE_PET_CURSOR_CLEAR")
+TukuiPetBattleHUD:RegisterEvent("PET_BATTLE_CLOSE")
+TukuiPetBattleHUD:RegisterEvent("PET_BATTLE_OPENING_START")
 TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 	if event == "PLAYER_ENTERING_WORLD" then
 	print("|cffC495DDTukui|r & |cff1784d1ElvUI |rPet Battle HUD by |cffD38D01Azilroka|r - Version: |cff1784d1"..GetAddOnMetadata("PetBattleHUD", "Version"))
@@ -648,10 +648,17 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 	end)
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	end
-	if event == "COMPANION_UPDATE" then
+	if event == "COMPANION_UPDATE" or event == "BATTLE_PET_CURSOR_CLEAR" then
 		if TukuiPetBattleHUD_Pet1:IsShown() then
 			PlayerPetUpdate()
 		end
+	end
+	if event == "PET_BATTLE_CLOSE" or event == "PET_BATTLE_OPENING_START" then
+		TukuiPetBattleEnemyHUDInit = nil
+		TukuiPetBattleHUD_EnemyPet3:Hide()
+		TukuiPetBattleHUD_EnemyPet2:Hide()
+		TukuiPetBattleHUD_EnemyPet1:Hide()
+		EnemyPetUpdate()
 	end
 end)
 

@@ -600,9 +600,7 @@ end
 
 TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD:SetPoint("CENTER")
-TukuiPetBattleHUD:RegisterEvent("COMPANION_UPDATE")
 TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
-TukuiPetBattleHUD:RegisterEvent("BATTLE_PET_CURSOR_CLEAR")
 TukuiPetBattleHUD:RegisterEvent("PET_BATTLE_CLOSE")
 TukuiPetBattleHUD:RegisterEvent("PET_BATTLE_OPENING_START")
 TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
@@ -628,7 +626,6 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 			normtex = C["media"].normTex
 		end
 		for i = 1, 3 do
-			if not TukuiPetBattleHUDInit then PlayerPetUpdate() end
 			if C_PetBattles.IsInBattle() then
 				if not TukuiPetBattleEnemyHUDInit then EnemyPetUpdate() end
 				PetBattleFrameXPBar:Hide()
@@ -643,15 +640,14 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."HealthText"]:SetText(C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i).." / "..C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ENEMY, i))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkPowerIconText"]:SetText(C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, i))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIconText"]:SetText(C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, i))
+			else
+				if TukuiPetBattleHUD_Pet1:IsShown() then
+					PlayerPetUpdate()
+				end
 			end
 		end
 	end)
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	end
-	if event == "COMPANION_UPDATE" or event == "BATTLE_PET_CURSOR_CLEAR" then
-		if TukuiPetBattleHUD_Pet1:IsShown() then
-			PlayerPetUpdate()
-		end
 	end
 	if event == "PET_BATTLE_CLOSE" or event == "PET_BATTLE_OPENING_START" then
 		TukuiPetBattleEnemyHUDInit = nil

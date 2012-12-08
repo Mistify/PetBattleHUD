@@ -627,6 +627,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 		end
 		for i = 1, 3 do
 			if C_PetBattles.IsInBattle() then
+				if not TukuiPetBattleHUDInit then PlayerPetUpdate() end
 				if not TukuiPetBattleEnemyHUDInit then EnemyPetUpdate() end
 				PetBattleFrameXPBar:Hide()
 				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetMinMaxValues(0, C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ALLY, i))

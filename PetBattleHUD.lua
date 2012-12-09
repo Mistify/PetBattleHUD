@@ -413,6 +413,7 @@ local function EnemyPetUpdate()
 end
 
 local function HUDSetupAuras(frame, owner, index)
+	
 	_G[frame.."Buff1"]:Hide()
 	_G[frame.."Buff2"]:Hide()
 	_G[frame.."Buff3"]:Hide()
@@ -426,22 +427,16 @@ local function HUDSetupAuras(frame, owner, index)
 			if not _G[frame.."Buff1"]:IsShown() then
 				_G[frame.."Buff1"]:Show()
 				_G[frame.."Buff1"]:SetBackdropBorderColor(0,1,0)
-				_G[frame.."Buff1"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
-				_G[frame.."Buff1"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
 				if turnsRemaining >= 0 then _G[frame.."Buff1Text"]:SetText(turnsRemaining) else _G[frame.."Buff1Text"]:SetText(" ") end
 				_G[frame.."Buff1Texture"]:SetTexture(icon)
 			elseif not _G[frame.."Buff2"]:IsShown() then
 				_G[frame.."Buff2"]:Show()
 				_G[frame.."Buff2"]:SetBackdropBorderColor(0,1,0)
-				_G[frame.."Buff2"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
-				_G[frame.."Buff2"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
 				if turnsRemaining >= 0 then _G[frame.."Buff2Text"]:SetText(turnsRemaining) else _G[frame.."Buff2Text"]:SetText(" ") end
 				_G[frame.."Buff2Texture"]:SetTexture(icon)
 			elseif not _G[frame.."Buff3"]:IsShown() then
 				_G[frame.."Buff3"]:Show()
 				_G[frame.."Buff3"]:SetBackdropBorderColor(0,1,0)
-				_G[frame.."Buff3"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
-				_G[frame.."Buff3"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
 				if turnsRemaining >= 0 then _G[frame.."Buff3Text"]:SetText(turnsRemaining) else _G[frame.."Buff3Text"]:SetText(" ") end
 				_G[frame.."Buff3Texture"]:SetTexture(icon)
 			end
@@ -449,28 +444,23 @@ local function HUDSetupAuras(frame, owner, index)
 			if not _G[frame.."Debuff1"]:IsShown() then
 				_G[frame.."Debuff1"]:Show()
 				_G[frame.."Debuff1"]:SetBackdropBorderColor(1,0,0)
-				_G[frame.."Debuff1"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
-				_G[frame.."Debuff1"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
 				if turnsRemaining >= 0 then _G[frame.."Debuff1Text"]:SetText(turnsRemaining) else _G[frame.."Debuff1Text"]:SetText(" ") end
 				_G[frame.."Debuff1Texture"]:SetTexture(icon)
 			elseif not _G[frame.."Debuff2"]:IsShown() then
 				_G[frame.."Debuff2"]:Show()
 				_G[frame.."Debuff2"]:SetBackdropBorderColor(1,0,0)
-				_G[frame.."Debuff2"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
-				_G[frame.."Debuff2"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
 				if turnsRemaining >= 0 then _G[frame.."Debuff2Text"]:SetText(turnsRemaining) else _G[frame.."Debuff2Text"]:SetText(" ") end
 				_G[frame.."Debuff2Texture"]:SetTexture(icon)
 			elseif not _G[frame.."Debuff3"]:IsShown() then
 				_G[frame.."Debuff3"]:Show()
 				_G[frame.."Debuff3"]:SetBackdropBorderColor(1,0,0)
-				_G[frame.."Debuff3"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
-				_G[frame.."Debuff3"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
 				if turnsRemaining >= 0 then _G[frame.."Debuff3Text"]:SetText(turnsRemaining) else _G[frame.."Debuff3Text"]:SetText(" ") end
 				_G[frame.."Debuff3Texture"]:SetTexture(icon)
 			end
 		end
 	end
 end
+
 TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD:SetPoint("CENTER")
 TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -508,17 +498,29 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				if not oldenemy2speed then oldenemy2speed = C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, 2) end
 				if not oldenemy3power then oldenemy3power = C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, 3) end
 				if not oldenemy3speed then oldenemy3speed = C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, 3) end
-				PetBattleFrameXPBar:Hide()
+				
+				PetBattleFrameXPBar:Kill()
+				PetBattleFrame.ActiveAlly:Kill()
+				PetBattleFrame.Ally2:Kill()
+				PetBattleFrame.Ally3:Kill()
+				PetBattleFrame.ActiveEnemy:Kill()
+				PetBattleFrame.Enemy2:Kill()
+				PetBattleFrame.Enemy3:Kill()
+				PetBattleFrame.TopVersusText:Kill()
+					
 				HUDSetupAuras("TukuiPetBattleHUD_Pet1", LE_BATTLE_PET_ALLY, 1)
 				HUDSetupAuras("TukuiPetBattleHUD_Pet2", LE_BATTLE_PET_ALLY, 2)
 				HUDSetupAuras("TukuiPetBattleHUD_Pet3", LE_BATTLE_PET_ALLY, 3)
 				HUDSetupAuras("TukuiPetBattleHUD_EnemyPet1", LE_BATTLE_PET_ENEMY, 1)
 				HUDSetupAuras("TukuiPetBattleHUD_EnemyPet2", LE_BATTLE_PET_ENEMY, 2)
 				HUDSetupAuras("TukuiPetBattleHUD_EnemyPet3", LE_BATTLE_PET_ENEMY, 3)
+				
 				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetMinMaxValues(0, C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ALLY, i))
 				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetValue(C_PetBattles.GetHealth(LE_BATTLE_PET_ALLY, i))
 				_G["TukuiPetBattleHUD_Pet"..i.."HealthText"]:SetText(C_PetBattles.GetHealth(LE_BATTLE_PET_ALLY, i).." / "..C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ALLY, i))
 				_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetText(C_PetBattles.GetPower(LE_BATTLE_PET_ALLY, i))
+				_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetText(C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i))
+				
 				if C_PetBattles.GetPower(LE_BATTLE_PET_ALLY, i) > select(3,C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(i))) then
 					_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetTextColor(0, 1, 0, 1)
 				elseif C_PetBattles.GetPower(LE_BATTLE_PET_ALLY, i) < select(3,C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(i))) then
@@ -526,7 +528,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				else
 					_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetTextColor(1, 1, 1, 1)
 				end
-				_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetText(C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i))
+				
 				if C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i) > select(4,C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(i))) then
 					_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetTextColor(0, 1, 0, 1)
 				elseif C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i) < select(4,C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(i))) then
@@ -534,11 +536,14 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				else
 					_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetTextColor(1, 1, 1, 1)
 				end
+				
 				local normalizedally = C_PetBattles.GetHealth(LE_BATTLE_PET_ALLY, i) / C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ALLY, i)
 				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:GetStatusBarTexture():SetVertexColor(1-normalizedally, normalizedally, 0/255)
+				
 				_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetMinMaxValues(0, select(2,C_PetBattles.GetXP(LE_BATTLE_PET_ALLY, i)))
 				_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetValue(select(1,C_PetBattles.GetXP(LE_BATTLE_PET_ALLY, i)))
 				_G["TukuiPetBattleHUD_Pet"..i.."ExperienceText"]:SetText(select(1,C_PetBattles.GetXP(LE_BATTLE_PET_ALLY, i)).." / "..select(2,C_PetBattles.GetXP(LE_BATTLE_PET_ALLY, i)))
+				
 				if C_PetBattles.GetHealth(LE_BATTLE_PET_ALLY, i) == 0 then
 					_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropTexture"]:SetDesaturated(true)
 					_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropTextureDead"]:Show()
@@ -546,11 +551,13 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 					_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropTexture"]:SetDesaturated(false)
 					_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropTextureDead"]:Hide()
 				end
+				
 				if C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i) == 0 then
 					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetDesaturated(true)
 				else
 					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetDesaturated(false)
 				end
+				
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetMinMaxValues(0, C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ENEMY, i))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetValue(C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."HealthText"]:SetText(C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i).." / "..C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ENEMY, i))
@@ -563,6 +570,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				else
 					TukuiPetBattleHUD_EnemyPet1AtkPowerIconText:SetTextColor(1, 1, 1, 1)
 				end
+				
 				if C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, 2) > oldenemy2power then
 					TukuiPetBattleHUD_EnemyPet2AtkPowerIconText:SetTextColor(0, 1, 0, 1)
 				elseif C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, 2) < oldenemy2power then
@@ -570,6 +578,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				else
 					TukuiPetBattleHUD_EnemyPet2AtkPowerIconText:SetTextColor(1, 1, 1, 1)
 				end
+				
 				if C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, 3) > oldenemy3power then
 					TukuiPetBattleHUD_EnemyPet3AtkPowerIconText:SetTextColor(0, 1, 0, 1)
 				elseif C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, 3) < oldenemy3power then
@@ -587,6 +596,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				else
 					TukuiPetBattleHUD_EnemyPet1AtkSpeedIconText:SetTextColor(1, 1, 1, 1)
 				end
+				
 				if C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, 2) > oldenemy2speed then
 					TukuiPetBattleHUD_EnemyPet2AtkSpeedIconText:SetTextColor(0, 1, 0, 1)
 				elseif C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, 2) < oldenemy2speed then
@@ -594,6 +604,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				else
 					TukuiPetBattleHUD_EnemyPet2AtkSpeedIconText:SetTextColor(1, 1, 1, 1)
 				end
+				
 				if C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, 3) > oldenemy3speed then
 					TukuiPetBattleHUD_EnemyPet3AtkSpeedIconText:SetTextColor(0, 1, 0, 1)
 				elseif C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, 3) < oldenemy3speed then
@@ -601,6 +612,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				else
 					TukuiPetBattleHUD_EnemyPet3AtkSpeedIconText:SetTextColor(1, 1, 1, 1)
 				end
+				
 				if C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i) == 0 then
 					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetDesaturated(true)
 					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTextureDead"]:Show()
@@ -608,18 +620,25 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetDesaturated(false)
 					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTextureDead"]:Hide()
 				end
+				
 				local normalizedenemy = C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i) / C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ENEMY, i)
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:GetStatusBarTexture():SetVertexColor(1-normalizedenemy, normalizedenemy, 0/255)
+				
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetMinMaxValues(0, select(2,C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetValue(select(1,C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."ExperienceText"]:SetText(select(1,C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)).." / "..select(2,C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)))
-
-				if C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i) > C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, i) then
-					_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIcon"]:SetVertexColor(0, 1, 0)
-					_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 0, 0)
-				elseif C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i) < C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, i) then
-					_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 0, 0)
-					_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIcon"]:SetVertexColor(0, 1, 0)
+				
+				_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 1, 0)
+				_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 1, 0)
+				
+				local activeally = C_PetBattles.GetActivePet(LE_BATTLE_PET_ALLY)
+				local activeenemy = C_PetBattles.GetActivePet(LE_BATTLE_PET_ENEMY)
+				if C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, C_PetBattles.GetActivePet(LE_BATTLE_PET_ALLY)) > C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, C_PetBattles.GetActivePet(LE_BATTLE_PET_ALLY)) then
+					_G["TukuiPetBattleHUD_Pet"..activeally.."AtkSpeedIcon"]:SetVertexColor(0, 1, 0)
+					_G["TukuiPetBattleHUD_EnemyPet"..activeenemy.."AtkSpeedIcon"]:SetVertexColor(1, 0, 0)
+				elseif C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, C_PetBattles.GetActivePet(LE_BATTLE_PET_ALLY)) < C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, C_PetBattles.GetActivePet(LE_BATTLE_PET_ENEMY)) then
+					_G["TukuiPetBattleHUD_Pet"..activeally.."AtkSpeedIcon"]:SetVertexColor(1, 0, 0)
+					_G["TukuiPetBattleHUD_EnemyPet"..activeenemy.."AtkSpeedIcon"]:SetVertexColor(0, 1, 0)
 				end
 
 			else
@@ -689,3 +708,22 @@ function SlashCmdList.PBHUD(msg, editbox)
 		PBHShow = true
 	end
 end
+
+hooksecurefunc("PetBattleAuraHolder_Update", function(self)
+	if not self.petOwner or not self.petIndex then return end
+
+	local nextFrame = 1
+	for i=1, C_PetBattles.GetNumAuras(self.petOwner, self.petIndex) do
+		local auraID, instanceID, turnsRemaining, isBuff = C_PetBattles.GetAuraInfo(self.petOwner, self.petIndex, i)
+		if (isBuff and self.displayBuffs) or (not isBuff and self.displayDebuffs) then
+			local frame = self.frames[nextFrame]
+			-- always hide
+			frame.DebuffBorder:Hide()
+			frame:Hide()
+			frame.backdrop:Hide()
+			frame.Icon:Hide()
+			frame.Duration:SetText(turnsRemaining)
+			nextFrame = nextFrame + 1
+		end
+	end
+end)

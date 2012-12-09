@@ -7,12 +7,13 @@ else
 	border = C["media"]["bordercolor"]
 	if not AsphyxiaUI then offset = 1 else offset = 0 end
 end
-local width = 260
+
 
 local function CreatePlayerHUD(name)
+	local width = 260
 	local frame = CreateFrame("Frame", name, UIParent)
 	frame:Hide()
-	frame:Size(260, 60)
+	frame:Size(width, 60)
 	frame:CreateBackdrop("Transparent")
 	frame.backdrop:CreateShadow()
 
@@ -87,9 +88,10 @@ TukuiPetBattleHUD_Pet3:Point("BOTTOM", TukuiPetBattleHUD_Pet2, "TOP", 0, 8)
 --- Enemy
 
 local function CreateEnemyHUD(name, num)
+	local width = 260
 	local frame = CreateFrame("Frame", name, UIParent)
 	frame:Hide()
-	frame:Size(260, 60)
+	frame:Size(width, 60)
 	frame:CreateBackdrop("Transparent")
 	frame.backdrop:CreateShadow()
 	frame:SetScript("OnShow", function()

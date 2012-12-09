@@ -8,7 +8,6 @@ else
 	if not AsphyxiaUI then offset = 1 else offset = 0 end
 end
 
-
 local function CreatePlayerHUD(name)
 	local width = 260
 	local frame = CreateFrame("Frame", name, UIParent)
@@ -69,6 +68,34 @@ local function CreatePlayerHUD(name)
 	_G[name.."AtkSpeedIcon"]:SetPoint("TOPLEFT", _G[name.."Experience"].backdrop, "RIGHT", 2, 8)
 	_G[name.."AtkSpeedIconText"] = _G[name.."Experience"]:CreateFontString(nil, "OVERLAY")
 	_G[name.."AtkSpeedIconText"]:SetPoint("LEFT", _G[name.."Experience"].backdrop, "RIGHT", 20, 0)
+
+	for i = 1, 3 do
+		_G[name.."Buff"..i] = CreateFrame("Frame", _G[name.."Buff"..i], frame)
+		_G[name.."Buff"..i]:Hide()
+		_G[name.."Buff"..i]:Size(30)
+		_G[name.."Buff"..i]:SetTemplate()
+		_G[name.."Buff"..i.."Text"] = _G[name.."Buff"..i]:CreateFontString(nil, "OVERLAY")
+		_G[name.."Buff"..i.."Text"]:SetPoint("CENTER")
+		_G[name.."Buff"..i.."Texture"] = _G[name.."Buff"..i]:CreateTexture(_G[name.."Buff"..i], "OVERLAY")
+		_G[name.."Buff"..i.."Texture"]:SetInside(_G[name.."Buff"..i])
+		_G[name.."Buff"..i.."Texture"]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+		_G[name.."Debuff"..i] = CreateFrame("Frame", _G[name.."Debuff"..i], frame)
+		_G[name.."Debuff"..i]:Hide()
+		_G[name.."Debuff"..i]:Size(30)
+		_G[name.."Debuff"..i]:SetTemplate()
+		_G[name.."Debuff"..i.."Text"] = _G[name.."Debuff"..i]:CreateFontString(nil, "OVERLAY")
+		_G[name.."Debuff"..i.."Text"]:SetPoint("CENTER")
+		_G[name.."Debuff"..i.."Texture"] = _G[name.."Debuff"..i]:CreateTexture(_G[name.."Debuff"..i], "OVERLAY")
+		_G[name.."Debuff"..i.."Texture"]:SetInside(_G[name.."Debuff"..i])
+		_G[name.."Debuff"..i.."Texture"]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+	end
+
+	_G[name.."Buff1"]:SetPoint("TOPLEFT", frame, "TOPRIGHT", 5, 2)
+	_G[name.."Buff2"]:SetPoint("TOPLEFT", _G[name.."Buff1"], "TOPRIGHT", 3, 0)
+	_G[name.."Buff3"]:SetPoint("TOPLEFT", _G[name.."Buff2"], "TOPRIGHT", 3, 0)
+	_G[name.."Debuff1"]:SetPoint("BOTTOMLEFT", frame, "BOTTOMRIGHT", 5, -2)
+	_G[name.."Debuff2"]:SetPoint("BOTTOMLEFT", _G[name.."Debuff1"], "BOTTOMRIGHT", 3, 0)
+	_G[name.."Debuff3"]:SetPoint("BOTTOMLEFT", _G[name.."Debuff2"], "BOTTOMRIGHT", 3, 0)
 end
 
 CreatePlayerHUD("TukuiPetBattleHUD_Pet1")
@@ -80,12 +107,12 @@ TukuiPetBattleHUD_Pet1:SetScript("OnDragStop", function(self) self:StopMovingOrS
 TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 300)
 
 CreatePlayerHUD("TukuiPetBattleHUD_Pet2")
+TukuiPetBattleHUD_Pet2:SetParent(TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD_Pet2:Point("BOTTOM", TukuiPetBattleHUD_Pet1, "TOP", 0, 8)
 
 CreatePlayerHUD("TukuiPetBattleHUD_Pet3")
+TukuiPetBattleHUD_Pet3:SetParent(TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD_Pet3:Point("BOTTOM", TukuiPetBattleHUD_Pet2, "TOP", 0, 8)
-
---- Enemy
 
 local function CreateEnemyHUD(name, num)
 	local width = 260
@@ -187,6 +214,34 @@ local function CreateEnemyHUD(name, num)
 	_G[name.."AtkSpeedIcon"]:SetPoint("TOPRIGHT", _G[name.."Experience"].backdrop, "LEFT", -2, 8)
 	_G[name.."AtkSpeedIconText"] = _G[name.."Experience"]:CreateFontString(nil, "OVERLAY")
 	_G[name.."AtkSpeedIconText"]:SetPoint("RIGHT", _G[name.."Experience"].backdrop, "LEFT", -18, 0)
+
+	for i = 1, 3 do
+		_G[name.."Buff"..i] = CreateFrame("Frame", _G[name.."Buff"..i], frame)
+		_G[name.."Buff"..i]:Hide()
+		_G[name.."Buff"..i]:Size(30)
+		_G[name.."Buff"..i]:SetTemplate()
+		_G[name.."Buff"..i.."Text"] = _G[name.."Buff"..i]:CreateFontString(nil, "OVERLAY")
+		_G[name.."Buff"..i.."Text"]:SetPoint("CENTER")
+		_G[name.."Buff"..i.."Texture"] = _G[name.."Buff"..i]:CreateTexture(_G[name.."Buff"..i], "OVERLAY")
+		_G[name.."Buff"..i.."Texture"]:SetInside(_G[name.."Buff"..i])
+		_G[name.."Buff"..i.."Texture"]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+		_G[name.."Debuff"..i] = CreateFrame("Frame", _G[name.."Debuff"..i], frame)
+		_G[name.."Debuff"..i]:Hide()
+		_G[name.."Debuff"..i]:Size(30)
+		_G[name.."Debuff"..i]:SetTemplate()
+		_G[name.."Debuff"..i.."Text"] = _G[name.."Debuff"..i]:CreateFontString(nil, "OVERLAY")
+		_G[name.."Debuff"..i.."Text"]:SetPoint("CENTER")
+		_G[name.."Debuff"..i.."Texture"] = _G[name.."Debuff"..i]:CreateTexture(_G[name.."Debuff"..i], "OVERLAY")
+		_G[name.."Debuff"..i.."Texture"]:SetInside(_G[name.."Debuff"..i])
+		_G[name.."Debuff"..i.."Texture"]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+	end
+
+	_G[name.."Buff1"]:SetPoint("TOPRIGHT", frame, "TOPLEFT", -5, 2)
+	_G[name.."Buff2"]:SetPoint("TOPRIGHT", _G[name.."Buff1"], "TOPLEFT", -3, 0)
+	_G[name.."Buff3"]:SetPoint("TOPRIGHT", _G[name.."Buff2"], "TOPLEFT", -3, 0)
+	_G[name.."Debuff1"]:SetPoint("BOTTOMRIGHT", frame, "BOTTOMLEFT", -5, -2)
+	_G[name.."Debuff2"]:SetPoint("BOTTOMRIGHT", _G[name.."Debuff1"], "BOTTOMLEFT", -3, 0)
+	_G[name.."Debuff3"]:SetPoint("BOTTOMRIGHT", _G[name.."Debuff2"], "BOTTOMLEFT", -3, 0)
 end
 
 CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet1", 1)
@@ -198,12 +253,13 @@ TukuiPetBattleHUD_EnemyPet1:SetScript("OnDragStop", function(self) self:StopMovi
 TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 300)
 
 CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet2", 2)
+TukuiPetBattleHUD_EnemyPet2:SetParent(TukuiPetBattleHUD_EnemyPet1)
 TukuiPetBattleHUD_EnemyPet2:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet1, "TOP", 0, 8)
 
 CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet3", 3)
+TukuiPetBattleHUD_EnemyPet3:SetParent(TukuiPetBattleHUD_EnemyPet1)
 TukuiPetBattleHUD_EnemyPet3:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet2, "TOP", 0, 8)
 
--- Updates
 PetBattleFrame:HookScript("OnShow", function() TukuiPetBattleHUD_Pet1:Show() end)
 PetBattleFrame:HookScript("OnHide", function()
 	if not PBHShow then
@@ -258,6 +314,12 @@ local function PlayerPetUpdate()
 		_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetStatusBarTexture(normtex)
 		_G["TukuiPetBattleHUD_Pet"..i.."Experience"]:SetStatusBarColor(0.24,0.54,0.78)
 		_G["TukuiPetBattleHUD_Pet"..i.."ExperienceText"]:SetFont(font, fontsize, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."Buff1Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."Buff2Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."Buff3Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."Debuff1Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."Debuff2Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_Pet"..i.."Debuff3Text"]:SetFont(font, 20, fontflag)
 		_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetFont(font, fontsize, fontflag)
 		_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetFont(font, fontsize, fontflag)
 		_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetText(power)
@@ -340,14 +402,74 @@ local function EnemyPetUpdate()
 		_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetMinMaxValues(0, enemymaxhp)
 		_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetValue(enemyhp)
 		_G["TukuiPetBattleHUD_EnemyPet"..i.."HealthText"]:SetText(enemyhp.." / "..enemymaxhp)
+		_G["TukuiPetBattleHUD_EnemyPet"..i.."Buff1Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_EnemyPet"..i.."Buff2Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_EnemyPet"..i.."Buff3Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_EnemyPet"..i.."Debuff1Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_EnemyPet"..i.."Debuff2Text"]:SetFont(font, 20, fontflag)
+		_G["TukuiPetBattleHUD_EnemyPet"..i.."Debuff3Text"]:SetFont(font, 20, fontflag)
 		TukuiPetBattleEnemyHUDInit = true
 	end
 end
 
-local function SetupAuras()
-	for i = 1, C_PetBattles.GetNumAuras(LE_BATTLE_PET_ALLY, 1) do
-			
-	end	
+local function HUDSetupAuras(frame, owner, index)
+	_G[frame.."Buff1"]:Hide()
+	_G[frame.."Buff2"]:Hide()
+	_G[frame.."Buff3"]:Hide()
+	_G[frame.."Debuff1"]:Hide()
+	_G[frame.."Debuff2"]:Hide()
+	_G[frame.."Debuff3"]:Hide()
+	for i = 1, 6 do
+		auraID, instanceID, turnsRemaining, isBuff, casterOwner, casterIndex = C_PetBattles.GetAuraInfo(owner, index, i)
+		if auraID then id, name, icon, maxCooldown, description = C_PetBattles.GetAbilityInfoByID(auraID) else return end
+		if isBuff then
+			if not _G[frame.."Buff1"]:IsShown() then
+				_G[frame.."Buff1"]:Show()
+				_G[frame.."Buff1"]:SetBackdropBorderColor(0,1,0)
+				_G[frame.."Buff1"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
+				_G[frame.."Buff1"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
+				if turnsRemaining >= 0 then _G[frame.."Buff1Text"]:SetText(turnsRemaining) else _G[frame.."Buff1Text"]:SetText(" ") end
+				_G[frame.."Buff1Texture"]:SetTexture(icon)
+			elseif not _G[frame.."Buff2"]:IsShown() then
+				_G[frame.."Buff2"]:Show()
+				_G[frame.."Buff2"]:SetBackdropBorderColor(0,1,0)
+				_G[frame.."Buff2"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
+				_G[frame.."Buff2"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
+				if turnsRemaining >= 0 then _G[frame.."Buff2Text"]:SetText(turnsRemaining) else _G[frame.."Buff2Text"]:SetText(" ") end
+				_G[frame.."Buff2Texture"]:SetTexture(icon)
+			elseif not _G[frame.."Buff3"]:IsShown() then
+				_G[frame.."Buff3"]:Show()
+				_G[frame.."Buff3"]:SetBackdropBorderColor(0,1,0)
+				_G[frame.."Buff3"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
+				_G[frame.."Buff3"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
+				if turnsRemaining >= 0 then _G[frame.."Buff3Text"]:SetText(turnsRemaining) else _G[frame.."Buff3Text"]:SetText(" ") end
+				_G[frame.."Buff3Texture"]:SetTexture(icon)
+			end
+		else
+			if not _G[frame.."Debuff1"]:IsShown() then
+				_G[frame.."Debuff1"]:Show()
+				_G[frame.."Debuff1"]:SetBackdropBorderColor(1,0,0)
+				_G[frame.."Debuff1"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
+				_G[frame.."Debuff1"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
+				if turnsRemaining >= 0 then _G[frame.."Debuff1Text"]:SetText(turnsRemaining) else _G[frame.."Debuff1Text"]:SetText(" ") end
+				_G[frame.."Debuff1Texture"]:SetTexture(icon)
+			elseif not _G[frame.."Debuff2"]:IsShown() then
+				_G[frame.."Debuff2"]:Show()
+				_G[frame.."Debuff2"]:SetBackdropBorderColor(1,0,0)
+				_G[frame.."Debuff2"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
+				_G[frame.."Debuff2"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
+				if turnsRemaining >= 0 then _G[frame.."Debuff2Text"]:SetText(turnsRemaining) else _G[frame.."Debuff2Text"]:SetText(" ") end
+				_G[frame.."Debuff2Texture"]:SetTexture(icon)
+			elseif not _G[frame.."Debuff3"]:IsShown() then
+				_G[frame.."Debuff3"]:Show()
+				_G[frame.."Debuff3"]:SetBackdropBorderColor(1,0,0)
+				_G[frame.."Debuff3"]:SetScript("OnEnter", function() PetBattleAbilityTooltip_Show("BOTTOMLEFT", self, "TOPLEFT", 0, 2) end)
+				_G[frame.."Debuff3"]:SetScript("OnLeave", function() PetBattlePrimaryAbilityTooltip:Hide() end)
+				if turnsRemaining >= 0 then _G[frame.."Debuff3Text"]:SetText(turnsRemaining) else _G[frame.."Debuff3Text"]:SetText(" ") end
+				_G[frame.."Debuff3Texture"]:SetTexture(icon)
+			end
+		end
+	end
 end
 TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
 TukuiPetBattleHUD:SetPoint("CENTER")
@@ -387,6 +509,12 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				if not oldenemy3power then oldenemy3power = C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, 3) end
 				if not oldenemy3speed then oldenemy3speed = C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, 3) end
 				PetBattleFrameXPBar:Hide()
+				HUDSetupAuras("TukuiPetBattleHUD_Pet1", LE_BATTLE_PET_ALLY, 1)
+				HUDSetupAuras("TukuiPetBattleHUD_Pet2", LE_BATTLE_PET_ALLY, 2)
+				HUDSetupAuras("TukuiPetBattleHUD_Pet3", LE_BATTLE_PET_ALLY, 3)
+				HUDSetupAuras("TukuiPetBattleHUD_EnemyPet1", LE_BATTLE_PET_ENEMY, 1)
+				HUDSetupAuras("TukuiPetBattleHUD_EnemyPet2", LE_BATTLE_PET_ENEMY, 2)
+				HUDSetupAuras("TukuiPetBattleHUD_EnemyPet3", LE_BATTLE_PET_ENEMY, 3)
 				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetMinMaxValues(0, C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ALLY, i))
 				_G["TukuiPetBattleHUD_Pet"..i.."Health"]:SetValue(C_PetBattles.GetHealth(LE_BATTLE_PET_ALLY, i))
 				_G["TukuiPetBattleHUD_Pet"..i.."HealthText"]:SetText(C_PetBattles.GetHealth(LE_BATTLE_PET_ALLY, i).." / "..C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ALLY, i))
@@ -507,6 +635,18 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 			_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetTextColor(1, 1, 1, 1)
 			_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetDesaturated(false)
 			_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTextureDead"]:Hide()
+			_G["TukuiPetBattleHUD_Pet1Buff"..i]:Hide()
+			_G["TukuiPetBattleHUD_Pet2Buff"..i]:Hide()
+			_G["TukuiPetBattleHUD_Pet3Buff"..i]:Hide()
+			_G["TukuiPetBattleHUD_Pet1Debuff"..i]:Hide()
+			_G["TukuiPetBattleHUD_Pet2Debuff"..i]:Hide()
+			_G["TukuiPetBattleHUD_Pet3Debuff"..i]:Hide()
+			_G["TukuiPetBattleHUD_EnemyPet1Buff"..i]:Hide()
+			_G["TukuiPetBattleHUD_EnemyPet2Buff"..i]:Hide()
+			_G["TukuiPetBattleHUD_EnemyPet3Buff"..i]:Hide()
+			_G["TukuiPetBattleHUD_EnemyPet1Debuff"..i]:Hide()
+			_G["TukuiPetBattleHUD_EnemyPet2Debuff"..i]:Hide()
+			_G["TukuiPetBattleHUD_EnemyPet3Debuff"..i]:Hide()
 		end
 		TukuiPetBattleHUD_EnemyPet3:Hide()
 		TukuiPetBattleHUD_EnemyPet2:Hide()
@@ -538,66 +678,3 @@ function SlashCmdList.PBHUD(msg, editbox)
 		PBHShow = true
 	end
 end
---[[ DO NOT ENABLE THIS UNLESS YOU KNOW WHAT THE HELL YOUR DOING
-hooksecurefunc("PetBattleAuraHolder_Update", function(self)
-	if not self.petOwner or not self.petIndex then return end
-	for i = 1, C_PetBattles.GetNumAuras(owner, index)
-	auraID, instanceID, turnsRemaining, isBuff, casterOwner, casterIndex = C_PetBattles.GetAuraInfo(owner, index, auraindex)
-	if ( auraID ) then
-	local id, name, icon, maxCooldown, description = C_PetBattles.GetAbilityInfoByID(auraID);
-
-	C_PetBattles.GetAbilityInfoByID(id)
-	local nextFrame = 1
-	for i=1, C_PetBattles.GetNumAuras(self.petOwner, self.petIndex) do
-		local auraID, instanceID, turnsRemaining, isBuff = C_PetBattles.GetAuraInfo(self.petOwner, self.petIndex, i)
-		if (isBuff and self.displayBuffs) or (not isBuff and self.displayDebuffs) then
-			local frame = self.frames[nextFrame]
-			if self.petOwner == LE_BATTLE_PET_ALLY then
-				hudframe = _G["TukuiPetBattleHUD_Pet"..i]
-			else
-				hudframe = _G["TukuiPetBattleHUD_EnemyPet"..i]
-			end
-			-- always hide the border
-			frame.DebuffBorder:Hide()
-			if ( nextFrame == 1 ) then
-				frame:SetPoint("TOPLEFT", hudframe, "TOPRIGHT", -4, 0);
-			elseif ( (nextFrame - 1) % numPerRow == 0 ) then
-				frame:SetPoint("TOPLEFT", self.frames[nextFrame - numPerRow], "TOPRIGHT", -4, 0);
-			else
-				frame:SetPoint("TOPLEFT", self.frames[nextFrame - 1], "TOPRIGHT", -4, 0);
-	                end
-
-			if not frame.isSkinned then
-				frame:CreateBackdrop()
-				frame.backdrop:SetOutside(frame.Icon)
-				frame.Icon:SetTexCoord(.1,.9,.1,.9)
-			end
-
-			if isBuff then
-				frame.backdrop:SetBackdropBorderColor(0, 1, 0)
-			else
-				frame.backdrop:SetBackdropBorderColor(1, 0, 0)
-			end
-			
-			if turnsRemaining > 0 then
-				frame.Duration:SetText(turnsRemaining)
-			end
-			
-			frame.Duration:SetFont(C.media.font, 14, "OUTLINE")
-			frame.Duration:ClearAllPoints()
-			frame.Duration:SetPoint("CENTER", frame.Icon, "CENTER", 1, 0)
-		
-			nextFrame = nextFrame + 1
-		end
-	end
-end)
-	TukuiPetBattleHUD_Pet1IconBackdropTexture:SetDesaturated()
-	PetBattleFrame.EnemyPadDebuffFrame:ClearAllPoints()
-	PetBattleFrame.EnemyPadBuffFrame:ClearAllPoints()
-	PetBattleFrame.AllyPadDebuffFrame:ClearAllPoints()
-	PetBattleFrame.AllyPadBuffFrame:ClearAllPoints()
-	PetBattleFrame.EnemyPadDebuffFrame:SetPoint("BOTTOMLEFT", TukuiPetBattleHUD_EnemyPet1, "BOTTOMRIGHT", -9, 0)
-	PetBattleFrame.EnemyPadBuffFrame:SetPoint("TOPLEFT", TukuiPetBattleHUD_EnemyPet1, "TOPRIGHT", -9, 0)
-	PetBattleFrame.AllyPadDebuffFrame:SetPoint("TOPRIGHT", TukuiPetBattleHUD_Pet1, "TOPLEFT", 8, 0)
-	PetBattleFrame.AllyPadBuffFrame:SetPoint("BOTTOMRIGHT", TukuiPetBattleHUD_Pet1, "BOTTOMLEFT", 8, 0)
-]]

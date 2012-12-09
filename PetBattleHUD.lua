@@ -613,6 +613,15 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetMinMaxValues(0, select(2,C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Experience"]:SetValue(select(1,C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)))
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."ExperienceText"]:SetText(select(1,C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)).." / "..select(2,C_PetBattles.GetXP(LE_BATTLE_PET_ENEMY, i)))
+
+				if C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i) > C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, i) then
+					_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIcon"]:SetVertexColor(0, 1, 0)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 0, 0)
+				elseif C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, i) < C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, i) then
+					_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 0, 0)
+					_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIcon"]:SetVertexColor(0, 1, 0)
+				end
+
 			else
 				if TukuiPetBattleHUD_Pet1:IsShown() then
 					PlayerPetUpdate()
@@ -647,6 +656,8 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 			_G["TukuiPetBattleHUD_EnemyPet1Debuff"..i]:Hide()
 			_G["TukuiPetBattleHUD_EnemyPet2Debuff"..i]:Hide()
 			_G["TukuiPetBattleHUD_EnemyPet3Debuff"..i]:Hide()
+			_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 1, 0)
+			_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 1, 0)
 		end
 		TukuiPetBattleHUD_EnemyPet3:Hide()
 		TukuiPetBattleHUD_EnemyPet2:Hide()

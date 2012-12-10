@@ -701,10 +701,6 @@ PetBattleHUDCombatDetect:SetScript("OnEvent", function(self, event)
 	end
 end)
 
-SLASH_PBHUD1, SLASH_PBHUD2 = '/PBH', '/pbh'
-function SlashCmdList.PBHUD(msg, editbox)
-
-end
 SLASH_PBH1 = "/pbh"
 SlashCmdList["PBH"] = function(arg)
 	if arg == "KillBlizzardUI" then
@@ -715,7 +711,7 @@ SlashCmdList["PBH"] = function(arg)
 			BlizzKill = true
 			print("Killing Blizzard PetBattle UI...")
 		end
-	elseif arg =="" then
+	elseif arg == "" or arg =="show" or arg == "hide" then
 		if TukuiPetBattleHUD_Pet1:IsShown() then
 			TukuiPetBattleHUD_Pet1:Hide()
 			PBHShow = nil

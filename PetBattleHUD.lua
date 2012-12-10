@@ -260,7 +260,19 @@ CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet3", 3)
 TukuiPetBattleHUD_EnemyPet3:SetParent(TukuiPetBattleHUD_EnemyPet1)
 TukuiPetBattleHUD_EnemyPet3:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet2, "TOP", 0, 8)
 
-PetBattleFrame:HookScript("OnShow", function() TukuiPetBattleHUD_Pet1:Show() end)
+PetBattleFrame:HookScript("OnShow", function()
+	if BlizzKill then
+		PetBattleFrameXPBar:Kill()
+		PetBattleFrame.ActiveAlly:Kill()
+		PetBattleFrame.Ally2:Kill()
+		PetBattleFrame.Ally3:Kill()
+		PetBattleFrame.ActiveEnemy:Kill()
+		PetBattleFrame.Enemy2:Kill()
+		PetBattleFrame.Enemy3:Kill()
+		PetBattleFrame.TopVersusText:Kill()
+	end
+	TukuiPetBattleHUD_Pet1:Show()
+end)
 PetBattleFrame:HookScript("OnHide", function()
 	if not PBHShow then
 		TukuiPetBattleHUD_Pet1:Hide()
@@ -499,15 +511,6 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 				if not oldenemy3power then oldenemy3power = C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, 3) end
 				if not oldenemy3speed then oldenemy3speed = C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, 3) end
 				
-				PetBattleFrameXPBar:Kill()
-				PetBattleFrame.ActiveAlly:Kill()
-				PetBattleFrame.Ally2:Kill()
-				PetBattleFrame.Ally3:Kill()
-				PetBattleFrame.ActiveEnemy:Kill()
-				PetBattleFrame.Enemy2:Kill()
-				PetBattleFrame.Enemy3:Kill()
-				PetBattleFrame.TopVersusText:Kill()
-					
 				HUDSetupAuras("TukuiPetBattleHUD_Pet1", LE_BATTLE_PET_ALLY, 1)
 				HUDSetupAuras("TukuiPetBattleHUD_Pet2", LE_BATTLE_PET_ALLY, 2)
 				HUDSetupAuras("TukuiPetBattleHUD_Pet3", LE_BATTLE_PET_ALLY, 3)
@@ -700,16 +703,31 @@ end)
 
 SLASH_PBHUD1, SLASH_PBHUD2 = '/PBH', '/pbh'
 function SlashCmdList.PBHUD(msg, editbox)
-	if TukuiPetBattleHUD_Pet1:IsShown() then
-		TukuiPetBattleHUD_Pet1:Hide()
-		PBHShow = nil
-	else
-		TukuiPetBattleHUD_Pet1:Show()
-		PBHShow = true
+
+end
+SLASH_PBH1 = "/pbh"
+SlashCmdList["PBH"] = function(arg)
+	if arg == "KillBlizzardUI" then
+		if BlizzKill then
+			BlizzKill = nil
+			print("Blizzard Pet Battle UI will show upon reload. /rl")
+		else
+			BlizzKill = true
+			print("Killing Blizzard PetBattle UI...")
+		end
+	elseif arg =="" then
+		if TukuiPetBattleHUD_Pet1:IsShown() then
+			TukuiPetBattleHUD_Pet1:Hide()
+			PBHShow = nil
+		else
+			TukuiPetBattleHUD_Pet1:Show()
+			PBHShow = true
+		end
 	end
 end
 
 hooksecurefunc("PetBattleAuraHolder_Update", function(self)
+	if not BlizzKill then return end
 	if not self.petOwner or not self.petIndex then return end
 
 	local nextFrame = 1

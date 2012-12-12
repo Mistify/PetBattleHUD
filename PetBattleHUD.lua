@@ -655,6 +655,7 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 	end
 	if event == "PET_BATTLE_CLOSE" or event == "PET_BATTLE_OPENING_START" then
 		TukuiPetBattleEnemyHUDInit = nil
+		TukuiPetBattleHUDInit = nil
 		oldenemy1power = nil
 		oldenemy1speed = nil
 		oldenemy2power = nil

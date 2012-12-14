@@ -1,4 +1,5 @@
 local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
+local PBH = ElvUI and A:NewModule('PetBattleHUD','AceEvent-3.0')
 local border, offset
 if ElvUI then
 	border = A["media"]["bordercolor"]
@@ -6,6 +7,34 @@ if ElvUI then
 else
 	border = C["media"]["bordercolor"]
 	if not AsphyxiaUI then offset = 1 else offset = 0 end
+end
+
+local function EnableMover(frame,isFriend)
+	if ElvUI then
+		A:CreateMover(frame, 
+			isFriend and "BattlePetMover" or "EnemyBattlePetMover",
+			isFriend and "Battle Pet Frames" or "Enemy Battle Pet Frames", 
+			nil, nil, nil, "ALL,SOLO"
+		)
+	else
+		frame:SetMovable(true)
+		frame:EnableMouse(true)
+		frame:RegisterForDrag("LeftButton")
+		frame:SetScript("OnDragStart", function(self) if IsShiftKeyDown() then self:StartMoving() end end)
+		frame:SetScript("OnDragStop", function(self) self:StopMovingOrSizing()  end)
+	end
+end
+
+local function CheckOption(option)
+	if ElvUI then
+		if option == "PBHShow" then
+			return A.db.petbattlehud["alwaysShow"]
+		else
+			return A.db.petbattlehud["hideBlizzard"]
+		end
+	else
+		return _G[option]
+	end
 end
 
 local function CreatePlayerHUD(name)
@@ -97,22 +126,6 @@ local function CreatePlayerHUD(name)
 	_G[name.."Debuff2"]:SetPoint("BOTTOMLEFT", _G[name.."Debuff1"], "BOTTOMRIGHT", 3, 0)
 	_G[name.."Debuff3"]:SetPoint("BOTTOMLEFT", _G[name.."Debuff2"], "BOTTOMRIGHT", 3, 0)
 end
-
-CreatePlayerHUD("TukuiPetBattleHUD_Pet1")
-TukuiPetBattleHUD_Pet1:SetMovable(true)
-TukuiPetBattleHUD_Pet1:EnableMouse(true)
-TukuiPetBattleHUD_Pet1:RegisterForDrag("LeftButton")
-TukuiPetBattleHUD_Pet1:SetScript("OnDragStart", function(self) if IsShiftKeyDown() then self:StartMoving() end end)
-TukuiPetBattleHUD_Pet1:SetScript("OnDragStop", function(self) self:StopMovingOrSizing()  end)
-TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 300)
-
-CreatePlayerHUD("TukuiPetBattleHUD_Pet2")
-TukuiPetBattleHUD_Pet2:SetParent(TukuiPetBattleHUD_Pet1)
-TukuiPetBattleHUD_Pet2:Point("BOTTOM", TukuiPetBattleHUD_Pet1, "TOP", 0, 8)
-
-CreatePlayerHUD("TukuiPetBattleHUD_Pet3")
-TukuiPetBattleHUD_Pet3:SetParent(TukuiPetBattleHUD_Pet1)
-TukuiPetBattleHUD_Pet3:Point("BOTTOM", TukuiPetBattleHUD_Pet2, "TOP", 0, 8)
 
 local function CreateEnemyHUD(name, num)
 	local width = 260
@@ -252,41 +265,6 @@ local function CreateEnemyHUD(name, num)
 	_G[name.."Debuff2"]:SetPoint("BOTTOMRIGHT", _G[name.."Debuff1"], "BOTTOMLEFT", -3, 0)
 	_G[name.."Debuff3"]:SetPoint("BOTTOMRIGHT", _G[name.."Debuff2"], "BOTTOMLEFT", -3, 0)
 end
-
-CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet1", 1)
-TukuiPetBattleHUD_EnemyPet1:SetMovable(true)
-TukuiPetBattleHUD_EnemyPet1:EnableMouse(true)
-TukuiPetBattleHUD_EnemyPet1:RegisterForDrag("LeftButton")
-TukuiPetBattleHUD_EnemyPet1:SetScript("OnDragStart", function(self) if IsShiftKeyDown() then self:StartMoving() end end)
-TukuiPetBattleHUD_EnemyPet1:SetScript("OnDragStop", function(self) self:StopMovingOrSizing()  end)
-TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 300)
-
-CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet2", 2)
-TukuiPetBattleHUD_EnemyPet2:SetParent(TukuiPetBattleHUD_EnemyPet1)
-TukuiPetBattleHUD_EnemyPet2:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet1, "TOP", 0, 8)
-
-CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet3", 3)
-TukuiPetBattleHUD_EnemyPet3:SetParent(TukuiPetBattleHUD_EnemyPet1)
-TukuiPetBattleHUD_EnemyPet3:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet2, "TOP", 0, 8)
-
-PetBattleFrame:HookScript("OnShow", function()
-	if BlizzKill then
-		PetBattleFrameXPBar:Kill()
-		PetBattleFrame.ActiveAlly:Kill()
-		PetBattleFrame.Ally2:Kill()
-		PetBattleFrame.Ally3:Kill()
-		PetBattleFrame.ActiveEnemy:Kill()
-		PetBattleFrame.Enemy2:Kill()
-		PetBattleFrame.Enemy3:Kill()
-		PetBattleFrame.TopVersusText:Kill()
-	end
-	TukuiPetBattleHUD_Pet1:Show()
-end)
-PetBattleFrame:HookScript("OnHide", function()
-	if not PBHShow then
-		TukuiPetBattleHUD_Pet1:Hide()
-	end
-end)
 
 local function PlayerPetUpdate()
 	local font, fontsize, fontflag
@@ -483,15 +461,89 @@ local function HUDSetupAuras(frame, owner, index)
 	end
 end
 
-TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
-TukuiPetBattleHUD:SetPoint("CENTER")
-TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
-TukuiPetBattleHUD:RegisterEvent("PET_BATTLE_CLOSE")
-TukuiPetBattleHUD:RegisterEvent("PET_BATTLE_OPENING_START")
-TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
-	if event == "PLAYER_ENTERING_WORLD" then
+if ElvUI then
+	local P = select(4,unpack(ElvUI))
+	P.petbattlehud = {
+		["alwaysShow"] = false,
+		["hideBlizzard"] = false,
+	}
+	A.Options.args.petbattlehud = {
+		type = "group",
+		name = "Pet Battle HUD",
+		order = 3,
+		args = {
+			header = {
+				order = 1,
+				type = "header",
+				name = "Unit Frames for Pet Battles",
+			},
+			general = {
+				order = 2,
+				type = "group",
+				name = "General",
+				guiInline = true,
+				args = {
+					alwaysShow = {
+						order = 1,
+						type = "toggle",
+						name = "Always Show",
+						desc = "Always show the unit frames even when not in battle",
+						get = function(info) return A.db.petbattlehud[ info[#info] ] end,
+		    			set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; end, 
+					},
+					hideBlizzard = {
+						order = 2,
+						type = "toggle",
+						name = "Hide Blizzard",
+						desc = "Hide the Blizzard Pet Frames during battles",
+						get = function(info) return A.db.petbattlehud[ info[#info] ] end,
+		    			set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; if not value then A:StaticPopup_Show("CONFIG_RL"); end end, 
+					},
+				},
+			},
+		},
+	}
+else
+	SLASH_PBH1 = "/pbh"
+	SlashCmdList["PBH"] = function(arg)
+		if arg == "KillBlizzardUI" then
+			if BlizzKill then
+				BlizzKill = nil
+				print("Blizzard Pet Battle UI will show upon reload. /rl")
+			else
+				BlizzKill = true
+				print("Killing Blizzard PetBattle UI...")
+			end
+		elseif arg == "" or arg =="show" or arg == "hide" then
+			if TukuiPetBattleHUD_Pet1:IsShown() then
+				TukuiPetBattleHUD_Pet1:Hide()
+				PBHShow = nil
+			else
+				TukuiPetBattleHUD_Pet1:Show()
+				PBHShow = true
+			end
+		end
+	end
+end
+
+function PBHGetHighestQuality(enemyspeciesID)
+	local numPets = C_PetJournal.GetNumPets(PetJournal.isWild)
+	local MaxQuality = -1
+	for i = 1, numPets do
+	local petID, speciesID = C_PetJournal.GetPetInfoByIndex(i, isWild)
+		if speciesID == enemyspeciesID then
+			local _, _, _, _, Quality = C_PetJournal.GetPetStats(petID)
+			if MaxQuality < Quality then
+				MaxQuality = Quality
+			end
+		end
+	end
+	return MaxQuality
+end
+
+local function UpdateHud(self)
 	print("|cffC495DDTukui|r & |cff1784d1ElvUI |rPet Battle HUD by |cffD38D01Azilroka|r - Version: |cff1784d1"..GetAddOnMetadata("PetBattleHUD", "Version"))
-	if PBHShow then TukuiPetBattleHUD_Pet1:Show() end
+	if CheckOption("PBHShow") then TukuiPetBattleHUD_Pet1:Show() end
 	self:SetScript("OnUpdate", function()
 		local font, fontsize, fontflag
 		if ElvUI then
@@ -661,106 +713,138 @@ TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
 			end
 		end
 	end)
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	end
-	if event == "PET_BATTLE_CLOSE" or event == "PET_BATTLE_OPENING_START" then
-		TukuiPetBattleEnemyHUDInit = nil
-		TukuiPetBattleHUDInit = nil
-		oldenemy1power = nil
-		oldenemy1speed = nil
-		oldenemy2power = nil
-		oldenemy2speed = nil
-		oldenemy3power = nil
-		oldenemy3speed = nil
-		for i = 1, 3 do
-			_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetTextColor(1, 1, 1, 1)
-			_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetTextColor(1, 1, 1, 1)
-			_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetDesaturated(false)
-			_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTextureDead"]:Hide()
-			_G["TukuiPetBattleHUD_Pet1Buff"..i]:Hide()
-			_G["TukuiPetBattleHUD_Pet2Buff"..i]:Hide()
-			_G["TukuiPetBattleHUD_Pet3Buff"..i]:Hide()
-			_G["TukuiPetBattleHUD_Pet1Debuff"..i]:Hide()
-			_G["TukuiPetBattleHUD_Pet2Debuff"..i]:Hide()
-			_G["TukuiPetBattleHUD_Pet3Debuff"..i]:Hide()
-			_G["TukuiPetBattleHUD_EnemyPet1Buff"..i]:Hide()
-			_G["TukuiPetBattleHUD_EnemyPet2Buff"..i]:Hide()
-			_G["TukuiPetBattleHUD_EnemyPet3Buff"..i]:Hide()
-			_G["TukuiPetBattleHUD_EnemyPet1Debuff"..i]:Hide()
-			_G["TukuiPetBattleHUD_EnemyPet2Debuff"..i]:Hide()
-			_G["TukuiPetBattleHUD_EnemyPet3Debuff"..i]:Hide()
-			_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 1, 0)
-			_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 1, 0)
-		end
-		TukuiPetBattleHUD_EnemyPet3:Hide()
-		TukuiPetBattleHUD_EnemyPet2:Hide()
-		TukuiPetBattleHUD_EnemyPet1:Hide()
-		EnemyPetUpdate()
-	end
-end)
-
-PetBattleHUDCombatDetect = CreateFrame("Frame")
-PetBattleHUDCombatDetect:RegisterEvent("PLAYER_REGEN_DISABLED")
-PetBattleHUDCombatDetect:RegisterEvent("PLAYER_REGEN_ENABLED")
-PetBattleHUDCombatDetect:SetScript("OnEvent", function(self, event)
-	if event == "PLAYER_REGEN_DISABLED" or InCombatLockdown() then
-		TukuiPetBattleHUD_Pet1:Hide()
-	else
-		if PBHShow then
-			TukuiPetBattleHUD_Pet1:Show()
-		end
-	end
-end)
-
-SLASH_PBH1 = "/pbh"
-SlashCmdList["PBH"] = function(arg)
-	if arg == "KillBlizzardUI" then
-		if BlizzKill then
-			BlizzKill = nil
-			print("Blizzard Pet Battle UI will show upon reload. /rl")
-		else
-			BlizzKill = true
-			print("Killing Blizzard PetBattle UI...")
-		end
-	elseif arg == "" or arg =="show" or arg == "hide" then
-		if TukuiPetBattleHUD_Pet1:IsShown() then
-			TukuiPetBattleHUD_Pet1:Hide()
-			PBHShow = nil
-		else
-			TukuiPetBattleHUD_Pet1:Show()
-			PBHShow = true
-		end
-	end
 end
 
-hooksecurefunc("PetBattleAuraHolder_Update", function(self)
-	if not BlizzKill then return end
-	if not self.petOwner or not self.petIndex then return end
+local function SetupPBH()
+	CreatePlayerHUD("TukuiPetBattleHUD_Pet1")
+	TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 300)
+	EnableMover(TukuiPetBattleHUD_Pet1,true)
 
-	local nextFrame = 1
-	for i=1, C_PetBattles.GetNumAuras(self.petOwner, self.petIndex) do
-			local frame = self.frames[nextFrame]
-			-- always hide
-			frame.DebuffBorder:Hide()
-			frame:Hide()
-			frame.backdrop:Hide()
-			frame.Icon:Hide()
-			frame.Duration:SetText(turnsRemaining)
-			nextFrame = nextFrame + 1
+	CreatePlayerHUD("TukuiPetBattleHUD_Pet2")
+	TukuiPetBattleHUD_Pet2:SetParent(TukuiPetBattleHUD_Pet1)
+	TukuiPetBattleHUD_Pet2:Point("BOTTOM", TukuiPetBattleHUD_Pet1, "TOP", 0, 8)
+
+	CreatePlayerHUD("TukuiPetBattleHUD_Pet3")
+	TukuiPetBattleHUD_Pet3:SetParent(TukuiPetBattleHUD_Pet1)
+	TukuiPetBattleHUD_Pet3:Point("BOTTOM", TukuiPetBattleHUD_Pet2, "TOP", 0, 8)
+
+	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet1", 1)
+	TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 300)
+	EnableMover(TukuiPetBattleHUD_EnemyPet1,false)
+
+	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet2", 2)
+	TukuiPetBattleHUD_EnemyPet2:SetParent(TukuiPetBattleHUD_EnemyPet1)
+	TukuiPetBattleHUD_EnemyPet2:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet1, "TOP", 0, 8)
+
+	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet3", 3)
+	TukuiPetBattleHUD_EnemyPet3:SetParent(TukuiPetBattleHUD_EnemyPet1)
+	TukuiPetBattleHUD_EnemyPet3:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet2, "TOP", 0, 8)
+
+	PetBattleFrame:HookScript("OnShow", function()
+		if CheckOption("BlizzKill") then
+			PetBattleFrameXPBar:Kill()
+			PetBattleFrame.ActiveAlly:Kill()
+			PetBattleFrame.Ally2:Kill()
+			PetBattleFrame.Ally3:Kill()
+			PetBattleFrame.ActiveEnemy:Kill()
+			PetBattleFrame.Enemy2:Kill()
+			PetBattleFrame.Enemy3:Kill()
+			PetBattleFrame.TopVersusText:Kill()
+		end
+		TukuiPetBattleHUD_Pet1:Show()
+	end)
+	PetBattleFrame:HookScript("OnHide", function()
+		if not CheckOption("PBHShow") then
+			TukuiPetBattleHUD_Pet1:Hide()
+		end
+	end)
+
+	TukuiPetBattleHUD = CreateFrame("Frame", nil, TukuiPetBattleHUD_Pet1)
+	TukuiPetBattleHUD:SetPoint("CENTER")
+	if not ElvUI then
+		TukuiPetBattleHUD:RegisterEvent("PLAYER_ENTERING_WORLD")
 	end
-end)
+	TukuiPetBattleHUD:RegisterEvent("PET_BATTLE_CLOSE")
+	TukuiPetBattleHUD:RegisterEvent("PET_BATTLE_OPENING_START")
+	TukuiPetBattleHUD:SetScript("OnEvent", function(self, event)
+		if event == "PLAYER_ENTERING_WORLD" then
+			UpdateHud(self)
+			self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+		end
+		if event == "PET_BATTLE_CLOSE" or event == "PET_BATTLE_OPENING_START" then
+			TukuiPetBattleEnemyHUDInit = nil
+			TukuiPetBattleHUDInit = nil
+			oldenemy1power = nil
+			oldenemy1speed = nil
+			oldenemy2power = nil
+			oldenemy2speed = nil
+			oldenemy3power = nil
+			oldenemy3speed = nil
+			for i = 1, 3 do
+				_G["TukuiPetBattleHUD_Pet"..i.."AtkPowerIconText"]:SetTextColor(1, 1, 1, 1)
+				_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIconText"]:SetTextColor(1, 1, 1, 1)
+				_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetDesaturated(false)
+				_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTextureDead"]:Hide()
+				_G["TukuiPetBattleHUD_Pet1Buff"..i]:Hide()
+				_G["TukuiPetBattleHUD_Pet2Buff"..i]:Hide()
+				_G["TukuiPetBattleHUD_Pet3Buff"..i]:Hide()
+				_G["TukuiPetBattleHUD_Pet1Debuff"..i]:Hide()
+				_G["TukuiPetBattleHUD_Pet2Debuff"..i]:Hide()
+				_G["TukuiPetBattleHUD_Pet3Debuff"..i]:Hide()
+				_G["TukuiPetBattleHUD_EnemyPet1Buff"..i]:Hide()
+				_G["TukuiPetBattleHUD_EnemyPet2Buff"..i]:Hide()
+				_G["TukuiPetBattleHUD_EnemyPet3Buff"..i]:Hide()
+				_G["TukuiPetBattleHUD_EnemyPet1Debuff"..i]:Hide()
+				_G["TukuiPetBattleHUD_EnemyPet2Debuff"..i]:Hide()
+				_G["TukuiPetBattleHUD_EnemyPet3Debuff"..i]:Hide()
+				_G["TukuiPetBattleHUD_Pet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 1, 0)
+				_G["TukuiPetBattleHUD_EnemyPet"..i.."AtkSpeedIcon"]:SetVertexColor(1, 1, 0)
+			end
+			TukuiPetBattleHUD_EnemyPet3:Hide()
+			TukuiPetBattleHUD_EnemyPet2:Hide()
+			TukuiPetBattleHUD_EnemyPet1:Hide()
+			EnemyPetUpdate()
+		end
+	end)
 
-function PBHGetHighestQuality(enemyspeciesID)
-	local numPets = C_PetJournal.GetNumPets(PetJournal.isWild)
-	local MaxQuality = -1
-	for i = 1, numPets do
-	local petID, speciesID = C_PetJournal.GetPetInfoByIndex(i, isWild)
-		if speciesID == enemyspeciesID then
-			local _, _, _, _, Quality = C_PetJournal.GetPetStats(petID)
-			if MaxQuality < Quality then
-				MaxQuality = Quality
+	PetBattleHUDCombatDetect = CreateFrame("Frame")
+	PetBattleHUDCombatDetect:RegisterEvent("PLAYER_REGEN_DISABLED")
+	PetBattleHUDCombatDetect:RegisterEvent("PLAYER_REGEN_ENABLED")
+	PetBattleHUDCombatDetect:SetScript("OnEvent", function(self, event)
+		if event == "PLAYER_REGEN_DISABLED" or InCombatLockdown() then
+			TukuiPetBattleHUD_Pet1:Hide()
+		else
+			if CheckOption("PBHShow") then
+				TukuiPetBattleHUD_Pet1:Show()
 			end
 		end
+	end)
+
+	hooksecurefunc("PetBattleAuraHolder_Update", function(self)
+		if not CheckOption("BlizzKill") then return end
+		if not self.petOwner or not self.petIndex then return end
+
+		local nextFrame = 1
+		for i=1, C_PetBattles.GetNumAuras(self.petOwner, self.petIndex) do
+				local frame = self.frames[nextFrame]
+				-- always hide
+				frame.DebuffBorder:Hide()
+				frame:Hide()
+				frame.backdrop:Hide()
+				frame.Icon:Hide()
+				frame.Duration:SetText(turnsRemaining)
+				nextFrame = nextFrame + 1
+		end
+	end)
+end
+
+if not ElvUI then
+	SetupPBH()
+else
+	function PBH:Initialize()
+		SetupPBH()
+		UpdateHud(TukuiPetBattleHUD)
 	end
-	return MaxQuality
+
+	A:RegisterModule(PBH:GetName())
 end

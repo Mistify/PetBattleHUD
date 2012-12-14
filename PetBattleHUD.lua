@@ -128,6 +128,15 @@ local function CreateEnemyHUD(name, num)
 			frame.backdrop:SetBackdropBorderColor(1,0,0)
 		else
 			frame.backdrop:SetBackdropBorderColor(unpack(border))
+			if C_PetBattles.IsWildBattle(LE_BATTLE_PET_ENEMY, num) then
+				local ownedquality = PBHGetHighestQuality(enemyspeciesID)
+				if ownedquality == -1 then
+				else
+       	        			if ownedquality < enemyquality then
+						frame.backdrop:SetBackdropBorderColor(1,0.35,0)
+					end
+				end
+			end
 		end
 	end)
 
@@ -164,7 +173,7 @@ local function CreateEnemyHUD(name, num)
 
 	_G[name.."IconBackdrop"]:SetScript("OnLeave", function(self,...) GameTooltip:Hide() end)
 	_G[name.."IconBackdropText"] = _G[name.."IconBackdrop"]:CreateFontString(nil, "OVERLAY")
-	_G[name.."IconBackdropText"]:SetPoint("BOTTOMLEFT", 0, 2)
+	_G[name.."IconBackdropText"]:SetPoint("BOTTOMLEFT", 2, 2)
 
 	_G[name.."IconBackdropTexture"] = _G[name.."IconBackdrop"]:CreateTexture(_G[name.."IconBackdropTexture"], "MEDIUM")
 	_G[name.."IconBackdropTexture"]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
@@ -377,6 +386,7 @@ local function EnemyPetUpdate()
 		enemyquality = C_PetBattles.GetBreedQuality(LE_BATTLE_PET_ENEMY, i)
 		enemyhp = C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i)
 		enemymaxhp = C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ENEMY, i)
+		enemyspeciesID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY,i)
 		local er, eg, eb = GetItemQualityColor(enemyquality-1)
 		local enemyframes = C_PetBattles.GetNumPets(LE_BATTLE_PET_ENEMY)
 		if enemyframes == 1 then
@@ -739,3 +749,18 @@ hooksecurefunc("PetBattleAuraHolder_Update", function(self)
 			nextFrame = nextFrame + 1
 	end
 end)
+
+function PBHGetHighestQuality(enemyspeciesID)
+	local numPets = C_PetJournal.GetNumPets(PetJournal.isWild)
+	local MaxQuality = -1
+	for i = 1, numPets do
+	local petID, speciesID = C_PetJournal.GetPetInfoByIndex(i, isWild)
+		if speciesID == enemyspeciesID then
+			local _, _, _, _, Quality = C_PetJournal.GetPetStats(petID)
+			if MaxQuality < Quality then
+				MaxQuality = Quality
+			end
+		end
+	end
+	return MaxQuality
+end

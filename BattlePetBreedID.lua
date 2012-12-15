@@ -1,3 +1,5 @@
+--Credits: Mike Zaitchik, Simca, Nullberri, Warla, and Ro 
+
 local CPB = _G.C_PetBattles
 local CPJ = _G.C_PetJournal
 local abs = math.abs

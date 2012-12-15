@@ -717,28 +717,28 @@ end
 
 local function SetupPBH()
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet1")
-	TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 300)
+	TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 200)
 	EnableMover(TukuiPetBattleHUD_Pet1,true)
 
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet2")
 	TukuiPetBattleHUD_Pet2:SetParent(TukuiPetBattleHUD_Pet1)
-	TukuiPetBattleHUD_Pet2:Point("BOTTOM", TukuiPetBattleHUD_Pet1, "TOP", 0, 8)
+	TukuiPetBattleHUD_Pet2:Point("TOP", TukuiPetBattleHUD_Pet1, "BOTTOM", 0, 8)
 
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet3")
 	TukuiPetBattleHUD_Pet3:SetParent(TukuiPetBattleHUD_Pet1)
-	TukuiPetBattleHUD_Pet3:Point("BOTTOM", TukuiPetBattleHUD_Pet2, "TOP", 0, 8)
+	TukuiPetBattleHUD_Pet3:Point("TOP", TukuiPetBattleHUD_Pet2, "BOTTOM", 0, 8)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet1", 1)
-	TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 300)
+	TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 200)
 	EnableMover(TukuiPetBattleHUD_EnemyPet1,false)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet2", 2)
 	TukuiPetBattleHUD_EnemyPet2:SetParent(TukuiPetBattleHUD_EnemyPet1)
-	TukuiPetBattleHUD_EnemyPet2:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet1, "TOP", 0, 8)
+	TukuiPetBattleHUD_EnemyPet2:Point("TOP", TukuiPetBattleHUD_EnemyPet1, "BOTTOM", 0, 8)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet3", 3)
 	TukuiPetBattleHUD_EnemyPet3:SetParent(TukuiPetBattleHUD_EnemyPet1)
-	TukuiPetBattleHUD_EnemyPet3:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet2, "TOP", 0, 8)
+	TukuiPetBattleHUD_EnemyPet3:Point("TOP", TukuiPetBattleHUD_EnemyPet2, "BOTTOM", 0, 8)
 
 	PetBattleFrame:HookScript("OnShow", function()
 		if CheckOption("BlizzKill") then

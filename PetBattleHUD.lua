@@ -142,7 +142,7 @@ local function CreateEnemyHUD(name, num)
 		else
 			frame.backdrop:SetBackdropBorderColor(unpack(border))
 			if C_PetBattles.IsWildBattle(LE_BATTLE_PET_ENEMY, num) then
-				local ownedquality = PBHGetHighestQuality(enemyspeciesID)
+				local ownedquality = PBHGetHighestQuality(targetID)
 				if ownedquality == -1 then
 				else
        	        			if ownedquality < enemyquality then
@@ -364,7 +364,7 @@ local function EnemyPetUpdate()
 		enemyquality = C_PetBattles.GetBreedQuality(LE_BATTLE_PET_ENEMY, i)
 		enemyhp = C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i)
 		enemymaxhp = C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ENEMY, i)
-		enemyspeciesID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY,i)
+		enemyspeciesID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, i)
 		local er, eg, eb = GetItemQualityColor(enemyquality-1)
 		local enemyframes = C_PetBattles.GetNumPets(LE_BATTLE_PET_ENEMY)
 		if enemyframes == 1 then

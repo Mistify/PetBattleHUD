@@ -4,7 +4,7 @@
 ## Version: 1.08a
 ## Notes: A Pet Battle Heads Up Display Frame
 ## OptionalDeps: Tukui, ElvUI, AsphyxiaUI, DuffedUI, PetJournalEnhanced
-## SavedVariables: PBHShow, BlizzKill
+## SavedVariables: PBHShow, BlizzKill, ShowBreakdown, GrowUp
 
 PetBattleHUD.lua
 BattlePetBreedID.lua

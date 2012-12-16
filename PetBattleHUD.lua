@@ -34,6 +34,8 @@ local function CheckOption(option)
 			return A.db.petbattlehud["hideBlizzard"]
 		elseif option == "GrowUp" then
 			return A.db.petbattlehud["growUp"]
+		elseif option == "ShowBreakdown" then
+			return A.db.petbattlehud["showBreakdown"]
 		end
 	else
 		return _G[option]
@@ -130,6 +132,11 @@ local function CreatePlayerHUD(name)
 	_G[name.."Debuff3"]:SetPoint("BOTTOMLEFT", _G[name.."Debuff2"], "BOTTOMRIGHT", 3, 0)
 end
 
+local function round(num, idp)
+  local mult = 10^(idp or 0)
+  return math.floor(num * mult + 0.5) / mult
+end
+
 local function CreateEnemyHUD(name, num)
 	local width = 260
 	local frame = CreateFrame("Frame", name, UIParent)
@@ -177,7 +184,7 @@ local function CreateEnemyHUD(name, num)
 					GameTooltip:AddDoubleLine(C_PetJournal.GetBattlePetLink(petID), PBHGetBreedID_Journal(petID), 1, 1, 1, 1, 1, 1)
 					GameTooltip:AddDoubleLine("Species ID", speciesID, 1, 1, 1, 1, 0, 0)
 					GameTooltip:AddLine("Level "..level.."|r", 1, 1, 1)
-					if not PetJournalEnhanced then
+					if not PetJournalEnhanced or not CheckOption("ShowBreakdown") then
 						GameTooltip:AddLine(maxHealth, 1, 1, 1)
 						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
 						GameTooltip:AddLine(power, 1, 1, 1)
@@ -187,18 +194,23 @@ local function CreateEnemyHUD(name, num)
 					else
 						local h25, p25, s25, breedIndex, confidence = BreedInfo:Extrapolate(petID,25)
 						local hpds, pbds, sbds = unpack(PBHGetLevelBreakdown(petID))
+						local c1, c2, c3 = 1, 1, 0.8
+						assert(type(confidence)=="number")
+						if confidence > .15 then
+							c1, c2, c3 = 1, .53, .53
+						end
 						GameTooltip:AddDoubleLine("Stats Per Level", 1, 1, 1)
-						GameTooltip:AddDoubleLine(maxHealth, hpds, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine(maxHealth, round(hpds,2), 1, 1, 1, 1, 1, 1)
 						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
-						GameTooltip:AddDoubleLine("At Level 25", h25, 1, 1, 1, 1, 1, 1)
-						GameTooltip:AddDoubleLine(power, pbds, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine("At Level 25", h25, 1, 1, 1, c1, c2, c3)
+						GameTooltip:AddDoubleLine(power, round(pbds, 2), 1, 1, 1, 1, 1, 1)
 						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
-						GameTooltip:AddDoubleLine("At Level 25", p25, 1, 1, 1, 1, 1, 1)
-						GameTooltip:AddDoubleLine(speed, sbds, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine("At Level 25", p25, 1, 1, 1, c1, c2, c3)
+						GameTooltip:AddDoubleLine(speed, round(sbds, 2), 1, 1, 1, 1, 1, 1)
 						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
-						GameTooltip:AddDoubleLine("At Level 25", s25, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine("At Level 25", s25, 1, 1, 1, c1, c2, c3)
 						GameTooltip:AddDoubleLine("Breed Index", breedIndex, 1, 1, 1, 1, 1, 1)
-						GameTooltip:AddDoubleLine("Confidence", confidence, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine("Confidence", confidence, 1, 1, 1, c1, c2, c3)
 					end
 				end
 			end
@@ -488,6 +500,7 @@ if ElvUI then
 	P.petbattlehud = {
 		["alwaysShow"] = false,
 		["hideBlizzard"] = false,
+		["showBreakdown"] = true,
 		["growUp"] = false
 	}
 	A.Options.args.petbattlehud = {
@@ -521,6 +534,12 @@ if ElvUI then
 						desc = "Hide the Blizzard Pet Frames during battles",
 		    			set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; if not value then A:StaticPopup_Show("CONFIG_RL"); end end, 
 					},
+					showBreakdown = {
+						order = 3,
+						type = "toggle",
+						name = "Show a breakdown of stats",
+						desc = "Show a breakdown of stat bonus per level and stat prediction at Level 25",
+					},
 					growUp = {
 						order = 4,
 						type = "toggle",
@@ -543,7 +562,7 @@ else
 				BlizzKill = true
 				print("Killing Blizzard PetBattle UI...")
 			end
-		elseif arg == "" or arg =="show" or arg == "hide" then
+		elseif arg == "" or arg == "show" or arg == "hide" then
 			if TukuiPetBattleHUD_Pet1:IsShown() then
 				TukuiPetBattleHUD_Pet1:Hide()
 				PBHShow = nil

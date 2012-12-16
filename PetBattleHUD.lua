@@ -577,6 +577,12 @@ else
 				GrowUp = true
 			end
 			print("You must reload your UI for changes to take place. /rl")
+		elseif arg == "breakdown" or arg == "showstats" then
+			if ShowBreakdown then
+				ShowBreakdown = false
+			else
+				ShowBreakdown = true
+			end
 		elseif arg == "" then
 			print("Pet Battle HUD Options.")
 			print("/pbh show or hide - Show/Hide Frames. (Permanent Show) ")

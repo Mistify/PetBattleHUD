@@ -1,5 +1,6 @@
 local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
 local PBH = ElvUI and A:NewModule('PetBattleHUD','AceEvent-3.0')
+
 local border, offset
 if ElvUI then
 	border = A["media"]["bordercolor"]
@@ -168,16 +169,35 @@ local function CreateEnemyHUD(name, num)
 
 			if speciesID == targetID then
 				local _, maxHealth, power, speed = C_PetJournal.GetPetStats(petID)
+				local speciesID = C_PetJournal.GetPetInfoByPetID(petID)
 				if C_PetJournal.GetBattlePetLink(petID) then
 					GameTooltip:AddLine(" ")
-					GameTooltip:AddLine(C_PetJournal.GetBattlePetLink(petID))
+					GameTooltip:AddDoubleLine(C_PetJournal.GetBattlePetLink(petID), PBHGetBreedID_Journal(petID), 1, 1, 1, 1, 1, 1)
+					GameTooltip:AddDoubleLine("Species ID", speciesID, 1, 1, 1, 1, 0, 0)
 					GameTooltip:AddLine("Level "..level.."|r", 1, 1, 1)
-					GameTooltip:AddLine(maxHealth, 1, 1, 1)
-					GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
-					GameTooltip:AddLine(power, 1, 1, 1)
-					GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
-					GameTooltip:AddLine(speed, 1, 1, 1)
-					GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
+					if not PetJournalEnhanced then
+						GameTooltip:AddLine(maxHealth, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
+						GameTooltip:AddLine(power, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
+						GameTooltip:AddLine(speed, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
+					else
+						local h25, p25, s25, breedIndex, confidence = BreedInfo:Extrapolate(petID,25)
+						local hpds, pbds, sbds = unpack(PBHGetLevelBreakdown(petID))
+						GameTooltip:AddDoubleLine("Stats Per Level", 1, 1, 1)
+						GameTooltip:AddDoubleLine(maxHealth, hpds, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
+						GameTooltip:AddDoubleLine("At Level 25", h25, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine(power, pbds, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
+						GameTooltip:AddDoubleLine("At Level 25", p25, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine(speed, sbds, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
+						GameTooltip:AddDoubleLine("At Level 25", s25, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine("Breed Index", breedIndex, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine("Confidence", confidence, 1, 1, 1, 1, 1, 1)
+					end
 				end
 			end
 		end
@@ -827,6 +847,7 @@ local function SetupPBH()
 		local nextFrame = 1
 		for i=1, C_PetBattles.GetNumAuras(self.petOwner, self.petIndex) do
 				local frame = self.frames[nextFrame]
+				if not frame then return end
 				-- always hide
 				frame.DebuffBorder:Hide()
 				frame:Hide()

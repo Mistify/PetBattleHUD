@@ -3,7 +3,7 @@
 ## Author: Azilroka
 ## Version: 1.08a
 ## Notes: A Pet Battle Heads Up Display Frame
-## OptionalDeps: Tukui, ElvUI, AsphyxiaUI, DuffedUI
+## OptionalDeps: Tukui, ElvUI, AsphyxiaUI, DuffedUI, PetJournalEnhanced
 ## SavedVariables: PBHShow, BlizzKill
 
 PetBattleHUD.lua

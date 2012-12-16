@@ -171,8 +171,9 @@ local function CreateEnemyHUD(name, num)
 		GameTooltip:SetOwner(self, 'ANCHOR_TOPRIGHT', 2, 4)
 		GameTooltip:ClearLines()
 		local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, num)
+		GameTooltip:AddDoubleLine("Current Enemy", PBHGetBreedID_Battle(num), 1, 1, 1, 1, 1, 1)
 		local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
-		if ownedString ~= nil then GameTooltip:AddLine(ownedString) end
+		if ownedString ~= nil then GameTooltip:AddLine(" ") GameTooltip:AddLine(ownedString) end
 		for i=1,C_PetJournal.GetNumPets(false) do 
 			local petID, speciesID, _, _, level, _, _, _, _, petType, _, _, _, _, _, _, _ = C_PetJournal.GetPetInfoByIndex(i)
 
@@ -595,11 +596,11 @@ end
 function PBHGetHighestQuality(enemyspeciesID)
 	local numPets = C_PetJournal.GetNumPets(PetJournal.isWild)
 	local MaxQuality = -1
-	local Quality = -1
 	for i = 1, numPets do
 	local petID, speciesID = C_PetJournal.GetPetInfoByIndex(i, isWild)
 		if speciesID == enemyspeciesID then
 			local _, _, _, _, Quality = C_PetJournal.GetPetStats(petID)
+			if Quality == nil then Quality = -1 end
 			if MaxQuality < Quality then
 				MaxQuality = Quality
 			end
@@ -610,6 +611,22 @@ end
 
 local function UpdateHud(self)
 	print("|cffC495DDTukui|r & |cff1784d1ElvUI |rPet Battle HUD by |cffD38D01Azilroka|r - Version: |cff1784d1"..GetAddOnMetadata("PetBattleHUD", "Version"))
+	local point, relativePoint, xcoord, ycoord
+	if CheckOption("GrowUp") then
+		point = "BOTTOM"
+		relativePoint = "TOP"
+		xcoord = 0
+		ycoord = 8
+	else
+		point = "TOP"
+		relativePoint = "BOTTOM"
+		xcoord = 0
+		ycoord = -8
+	end
+	TukuiPetBattleHUD_Pet2:SetPoint(point, TukuiPetBattleHUD_Pet1, relativePoint, xcoord, ycoord)
+	TukuiPetBattleHUD_Pet3:SetPoint(point, TukuiPetBattleHUD_Pet2, relativePoint, xcoord, ycoord)
+	TukuiPetBattleHUD_EnemyPet2:SetPoint(point, TukuiPetBattleHUD_EnemyPet1, relativePoint, xcoord, ycoord)
+	TukuiPetBattleHUD_EnemyPet3:SetPoint(point, TukuiPetBattleHUD_EnemyPet2, relativePoint, xcoord, ycoord)
 	if CheckOption("PBHShow") then TukuiPetBattleHUD_Pet1:Show() end
 	self:SetScript("OnUpdate", function()
 		local font, fontsize, fontflag
@@ -682,12 +699,6 @@ local function UpdateHud(self)
 				else
 					_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropTexture"]:SetDesaturated(false)
 					_G["TukuiPetBattleHUD_Pet"..i.."IconBackdropTextureDead"]:Hide()
-				end
-				
-				if C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i) == 0 then
-					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetDesaturated(true)
-				else
-					_G["TukuiPetBattleHUD_EnemyPet"..i.."IconBackdropTexture"]:SetDesaturated(false)
 				end
 				
 				_G["TukuiPetBattleHUD_EnemyPet"..i.."Health"]:SetMinMaxValues(0, C_PetBattles.GetMaxHealth(LE_BATTLE_PET_ENEMY, i))
@@ -765,10 +776,10 @@ local function UpdateHud(self)
 				
 				local activeally = C_PetBattles.GetActivePet(LE_BATTLE_PET_ALLY)
 				local activeenemy = C_PetBattles.GetActivePet(LE_BATTLE_PET_ENEMY)
-				if C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, C_PetBattles.GetActivePet(LE_BATTLE_PET_ALLY)) > C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, C_PetBattles.GetActivePet(LE_BATTLE_PET_ALLY)) then
+				if C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, activeally) > C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, activeenemy) then
 					_G["TukuiPetBattleHUD_Pet"..activeally.."AtkSpeedIcon"]:SetVertexColor(0, 1, 0)
 					_G["TukuiPetBattleHUD_EnemyPet"..activeenemy.."AtkSpeedIcon"]:SetVertexColor(1, 0, 0)
-				elseif C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, C_PetBattles.GetActivePet(LE_BATTLE_PET_ALLY)) < C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, C_PetBattles.GetActivePet(LE_BATTLE_PET_ENEMY)) then
+				elseif C_PetBattles.GetSpeed(LE_BATTLE_PET_ALLY, activeally) < C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, activeenemy) then
 					_G["TukuiPetBattleHUD_Pet"..activeally.."AtkSpeedIcon"]:SetVertexColor(1, 0, 0)
 					_G["TukuiPetBattleHUD_EnemyPet"..activeenemy.."AtkSpeedIcon"]:SetVertexColor(0, 1, 0)
 				end
@@ -783,26 +794,15 @@ local function UpdateHud(self)
 end
 
 local function SetupPBH()
-	local point, relativePoint
-	if CheckOption("GrowUp") then
-		point = "BOTTOM"
-		relativePoint = "TOP"
-	else
-		point = "TOP"
-		relativePoint = "BOTTOM"
-	end
-
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet1")
 	TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 200)
 	EnableMover(TukuiPetBattleHUD_Pet1,true)
 
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet2")
 	TukuiPetBattleHUD_Pet2:SetParent(TukuiPetBattleHUD_Pet1)
-	TukuiPetBattleHUD_Pet2:Point(point, TukuiPetBattleHUD_Pet1, relativePoint, 0, 8)
-
+	
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet3")
 	TukuiPetBattleHUD_Pet3:SetParent(TukuiPetBattleHUD_Pet1)
-	TukuiPetBattleHUD_Pet3:Point(point, TukuiPetBattleHUD_Pet2, relativePoint, 0, 8)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet1", 1)
 	TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 200)
@@ -810,11 +810,9 @@ local function SetupPBH()
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet2", 2)
 	TukuiPetBattleHUD_EnemyPet2:SetParent(TukuiPetBattleHUD_EnemyPet1)
-	TukuiPetBattleHUD_EnemyPet2:Point(point, TukuiPetBattleHUD_EnemyPet1, relativePoint, 0, 8)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet3", 3)
 	TukuiPetBattleHUD_EnemyPet3:SetParent(TukuiPetBattleHUD_EnemyPet1)
-	TukuiPetBattleHUD_EnemyPet3:Point(point, TukuiPetBattleHUD_EnemyPet2, relativePoint, 0, 8)
 
 	PetBattleFrame:HookScript("OnShow", function()
 		if CheckOption("BlizzKill") then

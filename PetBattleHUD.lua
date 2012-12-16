@@ -562,7 +562,7 @@ else
 				BlizzKill = true
 				print("Killing Blizzard PetBattle UI...")
 			end
-		elseif arg == "" or arg == "show" or arg == "hide" then
+		elseif arg == "show" or arg == "hide" then
 			if TukuiPetBattleHUD_Pet1:IsShown() then
 				TukuiPetBattleHUD_Pet1:Hide()
 				PBHShow = nil
@@ -577,6 +577,11 @@ else
 				GrowUp = true
 			end
 			print("You must reload your UI for changes to take place. /rl")
+		elseif arg == "" then
+			print("Pet Battle HUD Options.")
+			print("/pbh show or hide - Show/Hide Frames. (Permanent Show) ")
+			print("/pbh KillBlizzardUI - Kills out the default Blizzard Pet Battle UI.")
+			print("/pbh growup or growdown - Changes the anchors for the growth.")
 		end
 	end
 end

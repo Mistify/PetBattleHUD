@@ -2,7 +2,6 @@
 ## Title: |cffC495DDTukui|r & |cff1784d1ElvUI |r Pet Battle Heads Up Display
 ## Author: Azilroka
 ## Version: 1.08b
-
 ## Notes: A Pet Battle Heads Up Display Frame
 ## OptionalDeps: Tukui, ElvUI, AsphyxiaUI, DuffedUI, PetJournalEnhanced
 ## SavedVariables: PBHShow, BlizzKill, ShowBreakdown, GrowUp

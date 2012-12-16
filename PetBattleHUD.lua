@@ -529,6 +529,7 @@ end
 function PBHGetHighestQuality(enemyspeciesID)
 	local numPets = C_PetJournal.GetNumPets(PetJournal.isWild)
 	local MaxQuality = -1
+	local Quality = -1
 	for i = 1, numPets do
 	local petID, speciesID = C_PetJournal.GetPetInfoByIndex(i, isWild)
 		if speciesID == enemyspeciesID then

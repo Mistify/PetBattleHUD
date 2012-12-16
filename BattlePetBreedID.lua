@@ -11,233 +11,270 @@ local BasePetStatsArray = {}
 local BreedStatsArray = {}
 local cacheTime = true
 
+local BreedData = PetJournalEnhanced and PetJournalEnhanced:GetModule("BreedData")
+local BreedInfo = BreedInfo
+
+local EMPTY_PET = "0x0000000000000000"
+
+local function round(num, idp)
+  local mult = 10^(idp or 0)
+  return math.floor(num * mult + 0.5) / mult
+end
+
+local function clamp(num,minVal,maxVal)
+    return math.min(math.max(num,minVal),maxVal)
+end
+
+function PBHGetLevelBreakdown(petID)
+    if not PetJournalEnhanced then return end
+    if not petID or petID == EMPTY_PET then return 0,10,0 end
+
+    local speciesID, _, level, _, _, _,_ ,_, _, _, _, _, _, _, canBattle = C_PetJournal.GetPetInfoByPetID(petID)
+
+    if not canBattle then return 0,10,0 end
+    local health, _, power, speed, rarity = C_PetJournal.GetPetStats(petID)
+
+    local baseStatsIndex = BreedData.speciesToBaseStatProfile[speciesID]
+    if not baseStatsIndex then return -1,10,0 end
+
+    local baseStats = BreedData.baseStatsProfiles[baseStatsIndex]
+
+    local breedBonusPerLevel = {
+        clamp(round((((health-100)/5) / BreedData.qualityMultiplier[rarity]) - level*baseStats[1],1)/level,0,2),
+        clamp(round((power / BreedData.qualityMultiplier[rarity]) - level*baseStats[2],1)/level,0,2),
+        clamp(round((speed / BreedData.qualityMultiplier[rarity]) - level*baseStats[3],1)/level,0,2),
+    }
+
+    return breedBonusPerLevel
+end
+
 function PBHGetBreedID_Journal(nPetID)
-	local nHealth, nMaxHP, nPower, nSpeed, nQuality = CPJ.GetPetStats(nPetID)
-	local nSpeciesID, _, nLevel = CPJ.GetPetInfoByPetID(nPetID);
+    local nHealth, nMaxHP, nPower, nSpeed, nQuality = CPJ.GetPetStats(nPetID)
+    local nSpeciesID, _, nLevel = CPJ.GetPetInfoByPetID(nPetID);
 
-	nbreedID = PBHBPB_RetrieveBreedName(PBHBPB_CalculateBreedID(nSpeciesID, nQuality, nLevel, nMaxHP, nPower, nSpeed, false, false), nSpeciesID)
+    nbreedID = PBHBPB_RetrieveBreedName(PBHBPB_CalculateBreedID(nSpeciesID, nQuality, nLevel, nMaxHP, nPower, nSpeed, false, false), nSpeciesID)
 
-	return nbreedID
+    return nbreedID
 end
 
 function PBHGetBreedID_Battle(index)
-	local nSpeciesID = CPB.GetPetSpeciesID(2, index)
-	local nLevel = CPB.GetLevel(2, index)
-	local nMaxHP = CPB.GetMaxHealth(2, index)
-	local nPower = CPB.GetPower(2, index)
-	local nSpeed = CPB.GetSpeed(2, index)
-	local nQuality = CPB.GetBreedQuality(2, index)
-	local wild = false
-	local flying = false
-	if (CPB.IsWildBattle()) then
-		wild = true
-	end
-	if (CPB.GetPetType(2, index) == 3) then
-		flying = true
-	end
-	local nbreedID
-	nbreedID = PBHBPB_RetrieveBreedName(PBHBPB_CalculateBreedID(nSpeciesID, nQuality, nLevel, nMaxHP, nPower, nSpeed, wild, flying), nSpeciesID)
-	return nbreedID
+    local nSpeciesID = CPB.GetPetSpeciesID(2, index)
+    local nLevel = CPB.GetLevel(2, index)
+    local nMaxHP = CPB.GetMaxHealth(2, index)
+    local nPower = CPB.GetPower(2, index)
+    local nSpeed = CPB.GetSpeed(2, index)
+    local nQuality = CPB.GetBreedQuality(2, index)
+    local wild = false
+    local flying = false
+    if (CPB.IsWildBattle()) then
+        wild = true
+    end
+    if (CPB.GetPetType(2, index) == 3) then
+        flying = true
+    end
+    local nbreedID
+    nbreedID = PBHBPB_RetrieveBreedName(PBHBPB_CalculateBreedID(nSpeciesID, nQuality, nLevel, nMaxHP, nPower, nSpeed, wild, flying), nSpeciesID)
+    return nbreedID
 end
 
 function PBHBPB_CalculateBreedID(nSpeciesID, nQuality, nLevel, nMaxHP, nPower, nSpeed, wild, flying)
-	local breedID, nQL, minQuality, maxQuality
+    local breedID, nQL, minQuality, maxQuality
 
-	if nQuality == 0 then
-		minQuality = 1
-		maxQuality = 4
-	else
-		minQuality = nQuality
-		maxQuality = nQuality
-	end
+    if nQuality == 0 then
+        minQuality = 1
+        maxQuality = 4
+    else
+        minQuality = nQuality
+        maxQuality = nQuality
+    end
 
-	if not rawget(BasePetStatsArray, nSpeciesID) then return "NEW" end
+    if not rawget(BasePetStatsArray, nSpeciesID) then return "NEW" end
 
-	if nLevel < 5 and nQuality ~= 0 then
+    if nLevel < 5 and nQuality ~= 0 then
 
-		local testarray = {}
-		testarray[1] = 0
-		testarray[2] = 0
-		testarray[3] = 0
-		testarray[4] = 0
-		testarray[5] = 0
-		testarray[6] = 0
-		testarray[7] = 0
-		testarray[10] = 0
+        local testarray = {}
+        testarray[1] = 0
+        testarray[2] = 0
+        testarray[3] = 0
+        testarray[4] = 0
+        testarray[5] = 0
+        testarray[6] = 0
+        testarray[7] = 0
+        testarray[10] = 0
 
-		for nQuality = minQuality, maxQuality do
-			nQL = (nQuality + 9) * nLevel
+        for nQuality = minQuality, maxQuality do
+            nQL = (nQuality + 9) * nLevel
 
-			for ibreed = 3, 12 do
-				local hp = (BasePetStatsArray[nSpeciesID][1] + BreedStatsArray[ibreed][1]) * nQL / 10 * 5 + 100
-				if (wild == true) then
-					testarray[1] = floor((PBHBPB_Round(hp, true) / 1.2))
-					testarray[4] = PBHBPB_Round(PBHBPB_Round(hp, true) / 1.2, true)
-					testarray[7] = floor((PBHBPB_Round(hp, false) / 1.2))
-					testarray[10] = PBHBPB_Round(PBHBPB_Round(hp, false) / 1.2, true)
-				else
-					testarray[1] = PBHBPB_Round(hp, true)
-					testarray[4] = PBHBPB_Round(hp, false)
-				end
+            for ibreed = 3, 12 do
+                local hp = (BasePetStatsArray[nSpeciesID][1] + BreedStatsArray[ibreed][1]) * nQL / 10 * 5 + 100
+                if (wild == true) then
+                    testarray[1] = floor((PBHBPB_Round(hp, true) / 1.2))
+                    testarray[4] = PBHBPB_Round(PBHBPB_Round(hp, true) / 1.2, true)
+                    testarray[7] = floor((PBHBPB_Round(hp, false) / 1.2))
+                    testarray[10] = PBHBPB_Round(PBHBPB_Round(hp, false) / 1.2, true)
+                else
+                    testarray[1] = PBHBPB_Round(hp, true)
+                    testarray[4] = PBHBPB_Round(hp, false)
+                end
 
-				local power = (BasePetStatsArray[nSpeciesID][2] + BreedStatsArray[ibreed][2])* nQL / 10
-				testarray[2] = PBHBPB_Round(power, true)
-				testarray[5] = PBHBPB_Round(power, false)
+                local power = (BasePetStatsArray[nSpeciesID][2] + BreedStatsArray[ibreed][2])* nQL / 10
+                testarray[2] = PBHBPB_Round(power, true)
+                testarray[5] = PBHBPB_Round(power, false)
 
-				local speed = (BasePetStatsArray[nSpeciesID][3] + BreedStatsArray[ibreed][3])* nQL / 10
-				if (flying == true) then
-					testarray[3] = PBHBPB_Round(speed * 1.5, true)
-					testarray[6] = PBHBPB_Round(speed * 1.5, false)
-				else
-					testarray[3] = PBHBPB_Round(speed, true)
-					testarray[6] = PBHBPB_Round(speed, false)
-				end
+                local speed = (BasePetStatsArray[nSpeciesID][3] + BreedStatsArray[ibreed][3])* nQL / 10
+                if (flying == true) then
+                    testarray[3] = PBHBPB_Round(speed * 1.5, true)
+                    testarray[6] = PBHBPB_Round(speed * 1.5, false)
+                else
+                    testarray[3] = PBHBPB_Round(speed, true)
+                    testarray[6] = PBHBPB_Round(speed, false)
+                end
 
-				if ((testarray[1] == nMaxHP) or (testarray[4] == nMaxHP) or (testarray[7] == nMaxHP) or (testarray[10] == nMaxHP)) and ((testarray[2] == nPower) or (testarray[5] == nPower)) and ((testarray[3] == nSpeed) or (testarray[6] == nSpeed)) then
-					breedID = ibreed
-				end
-				
-				if breedID then break end
-			end
-		end
+                if ((testarray[1] == nMaxHP) or (testarray[4] == nMaxHP) or (testarray[7] == nMaxHP) or (testarray[10] == nMaxHP)) and ((testarray[2] == nPower) or (testarray[5] == nPower)) and ((testarray[3] == nSpeed) or (testarray[6] == nSpeed)) then
+                    breedID = ibreed
+                end
+                
+                if breedID then break end
+            end
+        end
 
-		if not breedID then breedID = "ERR-SIM" end
-	else
+        if not breedID then breedID = "ERR-SIM" end
+    else
 
-		local ihp = BasePetStatsArray[nSpeciesID][1] * 10
-		local ipower = BasePetStatsArray[nSpeciesID][2] * 10
-		local ispeed = BasePetStatsArray[nSpeciesID][3] * 10
+        local ihp = BasePetStatsArray[nSpeciesID][1] * 10
+        local ipower = BasePetStatsArray[nSpeciesID][2] * 10
+        local ispeed = BasePetStatsArray[nSpeciesID][3] * 10
 
-		local wildfactor = 1
-		if wild then wildfactor = 1.2 end
+        local wildfactor = 1
+        if wild then wildfactor = 1.2 end
 
-		local thp = nMaxHP * 100
-		local tpower = nPower * 100
-		local tspeed = nSpeed * 100
+        local thp = nMaxHP * 100
+        local tpower = nPower * 100
+        local tspeed = nSpeed * 100
 
-		if flying then tspeed = tspeed / 1.5 end
+        if flying then tspeed = tspeed / 1.5 end
 
-		local current, lowest
-		for i = minQuality, maxQuality do
-			nQL = (i + 9) * nLevel
+        local current, lowest
+        for i = minQuality, maxQuality do
+            nQL = (i + 9) * nLevel
 
-			local diff3 = abs(((ihp + 5) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 5) * nQL) - tpower) + abs(((ispeed + 5) * nQL) - tspeed)
-			local diff4 = abs(((ihp + 0) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 20) * nQL) - tpower) + abs(((ispeed + 0) * nQL) - tspeed)
-			local diff5 = abs(((ihp + 0) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 0) * nQL) - tpower) + abs(((ispeed + 20) * nQL) - tspeed)
-			local diff6 = abs(((ihp + 20) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 0) * nQL) - tpower) + abs(((ispeed + 0) * nQL) - tspeed)
-			local diff7 = abs(((ihp + 9) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 9) * nQL) - tpower) + abs(((ispeed + 0) * nQL) - tspeed)
-			local diff8 = abs(((ihp + 0) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 9) * nQL) - tpower) + abs(((ispeed + 9) * nQL) - tspeed)
-			local diff9 = abs(((ihp + 9) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 0) * nQL) - tpower) + abs(((ispeed + 9) * nQL) - tspeed)
-			local diff10 = abs(((ihp + 4) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 9) * nQL) - tpower) + abs(((ispeed + 4) * nQL) - tspeed)
-			local diff11 = abs(((ihp + 4) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 4) * nQL) - tpower) + abs(((ispeed + 9) * nQL) - tspeed)
-			local diff12 = abs(((ihp + 9) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 4) * nQL) - tpower) + abs(((ispeed + 4) * nQL) - tspeed)
+            local diff3 = abs(((ihp + 5) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 5) * nQL) - tpower) + abs(((ispeed + 5) * nQL) - tspeed)
+            local diff4 = abs(((ihp + 0) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 20) * nQL) - tpower) + abs(((ispeed + 0) * nQL) - tspeed)
+            local diff5 = abs(((ihp + 0) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 0) * nQL) - tpower) + abs(((ispeed + 20) * nQL) - tspeed)
+            local diff6 = abs(((ihp + 20) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 0) * nQL) - tpower) + abs(((ispeed + 0) * nQL) - tspeed)
+            local diff7 = abs(((ihp + 9) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 9) * nQL) - tpower) + abs(((ispeed + 0) * nQL) - tspeed)
+            local diff8 = abs(((ihp + 0) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 9) * nQL) - tpower) + abs(((ispeed + 9) * nQL) - tspeed)
+            local diff9 = abs(((ihp + 9) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 0) * nQL) - tpower) + abs(((ispeed + 9) * nQL) - tspeed)
+            local diff10 = abs(((ihp + 4) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 9) * nQL) - tpower) + abs(((ispeed + 4) * nQL) - tspeed)
+            local diff11 = abs(((ihp + 4) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 4) * nQL) - tpower) + abs(((ispeed + 9) * nQL) - tspeed)
+            local diff12 = abs(((ihp + 9) * nQL * 5 + 10000) / wildfactor - thp) + abs(((ipower + 4) * nQL) - tpower) + abs(((ispeed + 4) * nQL) - tspeed)
 
-			local current = min(diff3, diff4, diff5, diff6, diff7, diff8, diff9, diff10, diff11, diff12)
+            local current = min(diff3, diff4, diff5, diff6, diff7, diff8, diff9, diff10, diff11, diff12)
 
-			if not lowest or current < lowest then
-				lowest = current
-				nQuality = i
+            if not lowest or current < lowest then
+                lowest = current
+                nQuality = i
 
-				if (lowest == diff3) then breedID = 3
-				elseif (lowest == diff4) then breedID = 4
-				elseif (lowest == diff5) then breedID = 5
-				elseif (lowest == diff6) then breedID = 6
-				elseif (lowest == diff7) then breedID = 7
-				elseif (lowest == diff8) then breedID = 8
-				elseif (lowest == diff9) then breedID = 9
-				elseif (lowest == diff10) then breedID = 10
-				elseif (lowest == diff11) then breedID = 11
-				elseif (lowest == diff12) then breedID = 12
-				else return "ERR-HGH"
-				end
-			end
-		end
-	end
+                if (lowest == diff3) then breedID = 3
+                elseif (lowest == diff4) then breedID = 4
+                elseif (lowest == diff5) then breedID = 5
+                elseif (lowest == diff6) then breedID = 6
+                elseif (lowest == diff7) then breedID = 7
+                elseif (lowest == diff8) then breedID = 8
+                elseif (lowest == diff9) then breedID = 9
+                elseif (lowest == diff10) then breedID = 10
+                elseif (lowest == diff11) then breedID = 11
+                elseif (lowest == diff12) then breedID = 12
+                else return "ERR-HGH"
+                end
+            end
+        end
+    end
 
-	if breedID then
-		return breedID, nQuality
-	else
-		return "ERR-CAL"
-	end
+    if breedID then
+        return breedID, nQuality
+    else
+        return "ERR-CAL"
+    end
 end
 
 function PBHBPB_RetrieveBreedName(breedID, species)
-	if not breedID then return "ERR-ELY" end
+    if not breedID then return "ERR-ELY" end
 
-	if (string.sub(tostring(breedID), 1, 3) == "ERR") or (tostring(breedID) == "??") or (tostring(breedID) == "NEW") then return breedID end
+    if (string.sub(tostring(breedID), 1, 3) == "ERR") or (tostring(breedID) == "??") or (tostring(breedID) == "NEW") then return breedID end
 
-	local numbreedID = tonumber(breedID)
-	local result = {}
+    local numbreedID = tonumber(breedID)
+    local result = {}
 
-	if (not PBHstridform) then
-		PBHstridform = 3
-	end
-	
-	if (PBHstridform == 1) then
-		return numbreedID	
-	elseif (PBHstridform == 5) and (species) then
-		result[4] = tostring(BasePetStatsArray[species][1] + BreedStatsArray[numbreedID][1]) .. "/" .. tostring(BasePetStatsArray[species][2] + BreedStatsArray[numbreedID][2]) .. "/" .. tostring(BasePetStatsArray[species][3] + BreedStatsArray[numbreedID][3])
-		return result[4]
-	elseif (PBHstridform == 6) and (species) then
-		result[5] = tostring(BasePetStatsArray[species][1]) .. "/" .. tostring(BasePetStatsArray[species][2]) .. "/" .. tostring(BasePetStatsArray[species][3])
-		return result[5]
-	end
-	
-	if (numbreedID == 3) then
-		result[1] = "3/13"
-		result[2] = "B/B"
-		result[3] = "Balanced"
-	elseif (numbreedID == 4) then
-		result[1] = "4/14"
-		result[2] = "P/P"
-		result[3] = "Powerful"
-	elseif (numbreedID == 5) then
-		result[1] = "5/15"
-		result[2] = "S/S"
-		result[3] = "Speedy"
-	elseif (numbreedID == 6) then
-		result[1] = "6/16"
-		result[2] = "H/H"
-		result[3] = "Hulking"
-	elseif (numbreedID == 7) then
-		result[1] = "7/17"
-		result[2] = "H/P"
-		result[3] = "Brawny"
-	elseif (numbreedID == 8) then
-		result[1] = "8/18"
-		result[2] = "P/S"
-		result[3] = "Intense"
-	elseif (numbreedID == 9) then
-		result[1] = "9/19"
-		result[2] = "H/S"
-		result[3] = "Vigorous"
-	elseif (numbreedID == 10) then
-		result[1] = "10/20"
-		result[2] = "P/B"
-		result[3] = "Strong"
-	elseif (numbreedID == 11) then
-		result[1] = "11/21"
-		result[2] = "S/B"
-		result[3] = "Quick"
-	elseif (numbreedID == 12) then
-		result[1] = "12/22"
-		result[2] = "H/B"
-		result[3] = "Healthy"
-	else
-		result[1] = "ERR-NAM"
-		result[2] = "ERR-NAM"
-		result[3] = "ERR-NAM"
-	end
-	
-	if (PBHstridform == 2) then
-		return result[1]
-	elseif (PBHstridform == 3) then
-		return result[2]
-	elseif (PBHstridform == 4) then
-		return result[3]
-	else
-		return numbreedID
-	end
+    if (not PBHstridform) then
+        PBHstridform = 3
+    end
+    
+    if (PBHstridform == 1) then
+        return numbreedID   
+    elseif (PBHstridform == 5) and (species) then
+        result[4] = tostring(BasePetStatsArray[species][1] + BreedStatsArray[numbreedID][1]) .. "/" .. tostring(BasePetStatsArray[species][2] + BreedStatsArray[numbreedID][2]) .. "/" .. tostring(BasePetStatsArray[species][3] + BreedStatsArray[numbreedID][3])
+        return result[4]
+    elseif (PBHstridform == 6) and (species) then
+        result[5] = tostring(BasePetStatsArray[species][1]) .. "/" .. tostring(BasePetStatsArray[species][2]) .. "/" .. tostring(BasePetStatsArray[species][3])
+        return result[5]
+    end
+    
+    if (numbreedID == 3) then
+        result[1] = "3/13"
+        result[2] = "B/B"
+        result[3] = "Balanced"
+    elseif (numbreedID == 4) then
+        result[1] = "4/14"
+        result[2] = "P/P"
+        result[3] = "Powerful"
+    elseif (numbreedID == 5) then
+        result[1] = "5/15"
+        result[2] = "S/S"
+        result[3] = "Speedy"
+    elseif (numbreedID == 6) then
+        result[1] = "6/16"
+        result[2] = "H/H"
+        result[3] = "Hulking"
+    elseif (numbreedID == 7) then
+        result[1] = "7/17"
+        result[2] = "H/P"
+        result[3] = "Brawny"
+    elseif (numbreedID == 8) then
+        result[1] = "8/18"
+        result[2] = "P/S"
+        result[3] = "Intense"
+    elseif (numbreedID == 9) then
+        result[1] = "9/19"
+        result[2] = "H/S"
+        result[3] = "Vigorous"
+    elseif (numbreedID == 10) then
+        result[1] = "10/20"
+        result[2] = "P/B"
+        result[3] = "Strong"
+    elseif (numbreedID == 11) then
+        result[1] = "11/21"
+        result[2] = "S/B"
+        result[3] = "Quick"
+    elseif (numbreedID == 12) then
+        result[1] = "12/22"
+        result[2] = "H/B"
+        result[3] = "Healthy"
+    else
+        result[1] = "ERR-NAM"
+        result[2] = "ERR-NAM"
+        result[3] = "ERR-NAM"
+    end
+    
+    if (PBHstridform == 2) then
+        return result[1]
+    elseif (PBHstridform == 3) then
+        return result[2]
+    elseif (PBHstridform == 4) then
+        return result[3]
+    else
+        return numbreedID
+    end
 end
 
 local PBHBPB_Events = CreateFrame("FRAME", "PBHBPB_Events")
@@ -245,34 +282,34 @@ PBHBPB_Events:RegisterEvent("PET_BATTLE_OPENING_START")
 PBHBPB_Events:RegisterEvent("PET_BATTLE_CLOSE")
 
 local function PBHBPB_Events_OnEvent(self, event, ...)
-	if (event == "PET_BATTLE_OPENING_START") then
-		cacheTime = true
-	elseif (event == "PET_BATTLE_CLOSE") then
-		cacheTime = true
-	end
+    if (event == "PET_BATTLE_OPENING_START") then
+        cacheTime = true
+    elseif (event == "PET_BATTLE_CLOSE") then
+        cacheTime = true
+    end
 end
 
 PBHBPB_Events:SetScript("OnEvent", PBHBPB_Events_OnEvent)
 
 function PBHBPB_Round(number, roundup)
-	if not number then return end
-	number = tostring(number)
-	if not roundup then local roundup = true end
-	
-	if not string.find(number, "%.") then return tonumber(number) end
-	
-	local period = string.find(number, "%.")
-	local decimal = tonumber(string.sub(number, period + 1, period + 1))
-	local newnum = tonumber(string.sub(number, 1, period - 1))
-	
-	if (decimal == 5) then
-			if (roundup == true) then
-				newnum = newnum + 1
-			end
-	elseif (decimal > 5) then
-		newnum = newnum + 1
-	end		
-	return newnum
+    if not number then return end
+    number = tostring(number)
+    if not roundup then local roundup = true end
+    
+    if not string.find(number, "%.") then return tonumber(number) end
+    
+    local period = string.find(number, "%.")
+    local decimal = tonumber(string.sub(number, period + 1, period + 1))
+    local newnum = tonumber(string.sub(number, 1, period - 1))
+    
+    if (decimal == 5) then
+            if (roundup == true) then
+                newnum = newnum + 1
+            end
+    elseif (decimal > 5) then
+        newnum = newnum + 1
+    end     
+    return newnum
 end
 
 BreedStatsArray[3] = {0.5, 0.5, 0.5}

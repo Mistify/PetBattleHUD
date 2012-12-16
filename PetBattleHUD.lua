@@ -1,5 +1,6 @@
 local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
 local PBH = ElvUI and A:NewModule('PetBattleHUD','AceEvent-3.0')
+
 local border, offset
 if ElvUI then
 	border = A["media"]["bordercolor"]
@@ -29,8 +30,12 @@ local function CheckOption(option)
 	if ElvUI then
 		if option == "PBHShow" then
 			return A.db.petbattlehud["alwaysShow"]
-		else
+		elseif option == "BlizzKill" then
 			return A.db.petbattlehud["hideBlizzard"]
+		elseif option == "GrowUp" then
+			return A.db.petbattlehud["growUp"]
+		elseif option == "ShowBreakdown" then
+			return A.db.petbattlehud["showBreakdown"]
 		end
 	else
 		return _G[option]
@@ -127,6 +132,11 @@ local function CreatePlayerHUD(name)
 	_G[name.."Debuff3"]:SetPoint("BOTTOMLEFT", _G[name.."Debuff2"], "BOTTOMRIGHT", 3, 0)
 end
 
+local function round(num, idp)
+  local mult = 10^(idp or 0)
+  return math.floor(num * mult + 0.5) / mult
+end
+
 local function CreateEnemyHUD(name, num)
 	local width = 260
 	local frame = CreateFrame("Frame", name, UIParent)
@@ -168,16 +178,40 @@ local function CreateEnemyHUD(name, num)
 
 			if speciesID == targetID then
 				local _, maxHealth, power, speed = C_PetJournal.GetPetStats(petID)
+				local speciesID = C_PetJournal.GetPetInfoByPetID(petID)
 				if C_PetJournal.GetBattlePetLink(petID) then
 					GameTooltip:AddLine(" ")
-					GameTooltip:AddLine(C_PetJournal.GetBattlePetLink(petID))
+					GameTooltip:AddDoubleLine(C_PetJournal.GetBattlePetLink(petID), PBHGetBreedID_Journal(petID), 1, 1, 1, 1, 1, 1)
+					GameTooltip:AddDoubleLine("Species ID", speciesID, 1, 1, 1, 1, 0, 0)
 					GameTooltip:AddLine("Level "..level.."|r", 1, 1, 1)
-					GameTooltip:AddLine(maxHealth, 1, 1, 1)
-					GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
-					GameTooltip:AddLine(power, 1, 1, 1)
-					GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
-					GameTooltip:AddLine(speed, 1, 1, 1)
-					GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
+					if not PetJournalEnhanced or not CheckOption("ShowBreakdown") then
+						GameTooltip:AddLine(maxHealth, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
+						GameTooltip:AddLine(power, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
+						GameTooltip:AddLine(speed, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
+					else
+						local h25, p25, s25, breedIndex, confidence = BreedInfo:Extrapolate(petID,25)
+						local hpds, pbds, sbds = unpack(PBHGetLevelBreakdown(petID))
+						local c1, c2, c3 = 1, 1, 0.8
+						assert(type(confidence)=="number")
+						if confidence > .15 then
+							c1, c2, c3 = 1, .53, .53
+						end
+						GameTooltip:AddDoubleLine("Stats Per Level", 1, 1, 1)
+						GameTooltip:AddDoubleLine(maxHealth, round(hpds,2), 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipHealthIcon")
+						GameTooltip:AddDoubleLine("At Level 25", h25, 1, 1, 1, c1, c2, c3)
+						GameTooltip:AddDoubleLine(power, round(pbds, 2), 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipAttackIcon")
+						GameTooltip:AddDoubleLine("At Level 25", p25, 1, 1, 1, c1, c2, c3)
+						GameTooltip:AddDoubleLine(speed, round(sbds, 2), 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddTexture("Interface\\AddOns\\PetBattleHUD\\TooltipSpeedIcon")
+						GameTooltip:AddDoubleLine("At Level 25", s25, 1, 1, 1, c1, c2, c3)
+						GameTooltip:AddDoubleLine("Breed Index", breedIndex, 1, 1, 1, 1, 1, 1)
+						GameTooltip:AddDoubleLine("Confidence", confidence, 1, 1, 1, c1, c2, c3)
+					end
 				end
 			end
 		end
@@ -466,6 +500,8 @@ if ElvUI then
 	P.petbattlehud = {
 		["alwaysShow"] = false,
 		["hideBlizzard"] = false,
+		["showBreakdown"] = true,
+		["growUp"] = false
 	}
 	A.Options.args.petbattlehud = {
 		type = "group",
@@ -482,22 +518,34 @@ if ElvUI then
 				type = "group",
 				name = "General",
 				guiInline = true,
+				get = function(info) return A.db.petbattlehud[ info[#info] ] end,
+    			set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; end, 
 				args = {
 					alwaysShow = {
 						order = 1,
 						type = "toggle",
 						name = "Always Show",
 						desc = "Always show the unit frames even when not in battle",
-						get = function(info) return A.db.petbattlehud[ info[#info] ] end,
-		    			set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; end, 
 					},
 					hideBlizzard = {
 						order = 2,
 						type = "toggle",
 						name = "Hide Blizzard",
 						desc = "Hide the Blizzard Pet Frames during battles",
-						get = function(info) return A.db.petbattlehud[ info[#info] ] end,
 		    			set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; if not value then A:StaticPopup_Show("CONFIG_RL"); end end, 
+					},
+					showBreakdown = {
+						order = 3,
+						type = "toggle",
+						name = "Show a breakdown of stats",
+						desc = "Show a breakdown of stat bonus per level and stat prediction at Level 25",
+					},
+					growUp = {
+						order = 4,
+						type = "toggle",
+						name = "Grow the frames upwards",
+						desc = "Grow the frames from bottom for first pet upwards",
+						set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; A:StaticPopup_Show("CONFIG_RL") end, 
 					},
 				},
 			},
@@ -514,7 +562,7 @@ else
 				BlizzKill = true
 				print("Killing Blizzard PetBattle UI...")
 			end
-		elseif arg == "" or arg =="show" or arg == "hide" then
+		elseif arg == "" or arg == "show" or arg == "hide" then
 			if TukuiPetBattleHUD_Pet1:IsShown() then
 				TukuiPetBattleHUD_Pet1:Hide()
 				PBHShow = nil
@@ -522,6 +570,13 @@ else
 				TukuiPetBattleHUD_Pet1:Show()
 				PBHShow = true
 			end
+		elseif arg == "growup" or arg == "growdown" then
+			if GrowUp then
+				GrowUp = false
+			else
+				GrowUp = true
+			end
+			print("You must reload your UI for changes to take place. /rl")
 		end
 	end
 end
@@ -717,29 +772,38 @@ local function UpdateHud(self)
 end
 
 local function SetupPBH()
+	local point, relativePoint
+	if CheckOption("GrowUp") then
+		point = "BOTTOM"
+		relativePoint = "TOP"
+	else
+		point = "TOP"
+		relativePoint = "BOTTOM"
+	end
+
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet1")
-	TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 300)
+	TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 200)
 	EnableMover(TukuiPetBattleHUD_Pet1,true)
 
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet2")
 	TukuiPetBattleHUD_Pet2:SetParent(TukuiPetBattleHUD_Pet1)
-	TukuiPetBattleHUD_Pet2:Point("BOTTOM", TukuiPetBattleHUD_Pet1, "TOP", 0, 8)
+	TukuiPetBattleHUD_Pet2:Point(point, TukuiPetBattleHUD_Pet1, relativePoint, 0, 8)
 
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet3")
 	TukuiPetBattleHUD_Pet3:SetParent(TukuiPetBattleHUD_Pet1)
-	TukuiPetBattleHUD_Pet3:Point("BOTTOM", TukuiPetBattleHUD_Pet2, "TOP", 0, 8)
+	TukuiPetBattleHUD_Pet3:Point(point, TukuiPetBattleHUD_Pet2, relativePoint, 0, 8)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet1", 1)
-	TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 300)
+	TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 200)
 	EnableMover(TukuiPetBattleHUD_EnemyPet1,false)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet2", 2)
 	TukuiPetBattleHUD_EnemyPet2:SetParent(TukuiPetBattleHUD_EnemyPet1)
-	TukuiPetBattleHUD_EnemyPet2:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet1, "TOP", 0, 8)
+	TukuiPetBattleHUD_EnemyPet2:Point(point, TukuiPetBattleHUD_EnemyPet1, relativePoint, 0, 8)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet3", 3)
 	TukuiPetBattleHUD_EnemyPet3:SetParent(TukuiPetBattleHUD_EnemyPet1)
-	TukuiPetBattleHUD_EnemyPet3:Point("BOTTOM", TukuiPetBattleHUD_EnemyPet2, "TOP", 0, 8)
+	TukuiPetBattleHUD_EnemyPet3:Point(point, TukuiPetBattleHUD_EnemyPet2, relativePoint, 0, 8)
 
 	PetBattleFrame:HookScript("OnShow", function()
 		if CheckOption("BlizzKill") then
@@ -828,6 +892,7 @@ local function SetupPBH()
 		local nextFrame = 1
 		for i=1, C_PetBattles.GetNumAuras(self.petOwner, self.petIndex) do
 				local frame = self.frames[nextFrame]
+				if not frame then return end
 				-- always hide
 				frame.DebuffBorder:Hide()
 				frame:Hide()

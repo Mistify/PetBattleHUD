@@ -30,8 +30,10 @@ local function CheckOption(option)
 	if ElvUI then
 		if option == "PBHShow" then
 			return A.db.petbattlehud["alwaysShow"]
-		else
+		elseif option == "BlizzKill" then
 			return A.db.petbattlehud["hideBlizzard"]
+		elseif option == "GrowUp" then
+			return A.db.petbattlehud["growUp"]
 		end
 	else
 		return _G[option]
@@ -486,6 +488,7 @@ if ElvUI then
 	P.petbattlehud = {
 		["alwaysShow"] = false,
 		["hideBlizzard"] = false,
+		["growUp"] = false
 	}
 	A.Options.args.petbattlehud = {
 		type = "group",
@@ -502,22 +505,28 @@ if ElvUI then
 				type = "group",
 				name = "General",
 				guiInline = true,
+				get = function(info) return A.db.petbattlehud[ info[#info] ] end,
+    			set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; end, 
 				args = {
 					alwaysShow = {
 						order = 1,
 						type = "toggle",
 						name = "Always Show",
 						desc = "Always show the unit frames even when not in battle",
-						get = function(info) return A.db.petbattlehud[ info[#info] ] end,
-		    			set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; end, 
 					},
 					hideBlizzard = {
 						order = 2,
 						type = "toggle",
 						name = "Hide Blizzard",
 						desc = "Hide the Blizzard Pet Frames during battles",
-						get = function(info) return A.db.petbattlehud[ info[#info] ] end,
 		    			set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; if not value then A:StaticPopup_Show("CONFIG_RL"); end end, 
+					},
+					growUp = {
+						order = 4,
+						type = "toggle",
+						name = "Grow the frames upwards",
+						desc = "Grow the frames from bottom for first pet upwards",
+						set = function(info,value) A.db.petbattlehud[ info[#info] ] = value; A:StaticPopup_Show("CONFIG_RL") end, 
 					},
 				},
 			},
@@ -542,6 +551,13 @@ else
 				TukuiPetBattleHUD_Pet1:Show()
 				PBHShow = true
 			end
+		elseif arg == "growup" or arg == "growdown" then
+			if GrowUp then
+				GrowUp = false
+			else
+				GrowUp = true
+			end
+			print("You must reload your UI for changes to take place. /rl")
 		end
 	end
 end
@@ -736,17 +752,26 @@ local function UpdateHud(self)
 end
 
 local function SetupPBH()
+	local point, relativePoint
+	if CheckOption("GrowUp") then
+		point = "BOTTOM"
+		relativePoint = "TOP"
+	else
+		point = "TOP"
+		relativePoint = "BOTTOM"
+	end
+
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet1")
 	TukuiPetBattleHUD_Pet1:Point("RIGHT", UIParent, "BOTTOM", -200, 200)
 	EnableMover(TukuiPetBattleHUD_Pet1,true)
 
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet2")
 	TukuiPetBattleHUD_Pet2:SetParent(TukuiPetBattleHUD_Pet1)
-	TukuiPetBattleHUD_Pet2:Point("TOP", TukuiPetBattleHUD_Pet1, "BOTTOM", 0, 8)
+	TukuiPetBattleHUD_Pet2:Point(point, TukuiPetBattleHUD_Pet1, relativePoint, 0, 8)
 
 	CreatePlayerHUD("TukuiPetBattleHUD_Pet3")
 	TukuiPetBattleHUD_Pet3:SetParent(TukuiPetBattleHUD_Pet1)
-	TukuiPetBattleHUD_Pet3:Point("TOP", TukuiPetBattleHUD_Pet2, "BOTTOM", 0, 8)
+	TukuiPetBattleHUD_Pet3:Point(point, TukuiPetBattleHUD_Pet2, relativePoint, 0, 8)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet1", 1)
 	TukuiPetBattleHUD_EnemyPet1:Point("LEFT", UIParent, "BOTTOM", 200, 200)
@@ -754,11 +779,11 @@ local function SetupPBH()
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet2", 2)
 	TukuiPetBattleHUD_EnemyPet2:SetParent(TukuiPetBattleHUD_EnemyPet1)
-	TukuiPetBattleHUD_EnemyPet2:Point("TOP", TukuiPetBattleHUD_EnemyPet1, "BOTTOM", 0, 8)
+	TukuiPetBattleHUD_EnemyPet2:Point(point, TukuiPetBattleHUD_EnemyPet1, relativePoint, 0, 8)
 
 	CreateEnemyHUD("TukuiPetBattleHUD_EnemyPet3", 3)
 	TukuiPetBattleHUD_EnemyPet3:SetParent(TukuiPetBattleHUD_EnemyPet1)
-	TukuiPetBattleHUD_EnemyPet3:Point("TOP", TukuiPetBattleHUD_EnemyPet2, "BOTTOM", 0, 8)
+	TukuiPetBattleHUD_EnemyPet3:Point(point, TukuiPetBattleHUD_EnemyPet2, relativePoint, 0, 8)
 
 	PetBattleFrame:HookScript("OnShow", function()
 		if CheckOption("BlizzKill") then

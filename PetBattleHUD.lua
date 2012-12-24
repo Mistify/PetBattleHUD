@@ -1,12 +1,27 @@
 local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
 local PBH = ElvUI and A:NewModule('PetBattleHUD','AceEvent-3.0')
 
-local border, offset
+local font, fontsize, fontflag, border, offset, normtex
+local enemycustomName, enemyname, enemypower, enemyspeed, enemyxp, enemymaxXP, enemylevel, enemyicon, enemytype, enemyquality, enemyhp , enemymaxhp, enemyspeciesID
+
 if ElvUI then
+	font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
+	normtex = A["media"].normTex
 	border = A["media"]["bordercolor"]
 	offset = -1
 else
+	font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
+	if AsphyxiaUI then
+		if( A.client == "ruRU" ) then
+			font = C["media"]["pixelfont_ru"]
+			fontsize = 12
+		else
+			font = C["media"]["asphyxia"]
+			fontsize = 10
+		end
+	end
 	border = C["media"]["bordercolor"]
+	normtex = C["media"].normTex
 	if not AsphyxiaUI then offset = 1 else offset = 0 end
 end
 
@@ -302,28 +317,12 @@ local function CreateEnemyHUD(name, num)
 end
 
 local function PlayerPetUpdate()
-	local font, fontsize, fontflag
-	if ElvUI then
-		font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
-		normtex = A["media"].normTex
-	else
-		font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
-		if AsphyxiaUI then
-			if( A.client == "ruRU" ) then
-				font = C["media"]["pixelfont_ru"]
-				fontsize = 12
-			else
-				font = C["media"]["asphyxia"]
-				fontsize = 10
-			end
-		end
-		normtex = C["media"].normTex
-	end
 	for i = 1, 3 do
 		local petID = C_PetJournal.GetPetLoadOutInfo(i)
 		if petID == nil then return end
 		local _, customName, level, xp, maxXp, _, _, name, icon, petType = C_PetJournal.GetPetInfoByPetID(C_PetJournal.GetPetLoadOutInfo(i))
 		local hp, maxhp, power, speed, rarity = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(i))
+		if hp == 0 then	ReviveBattlePetButton:Show() BandageBattlePetButton:Show() end
 		local r, g, b = GetItemQualityColor(rarity-1)
 		_G["TukuiPetBattleHUD_Pet"..i]:Show()
 		if hp == 0 then
@@ -371,23 +370,6 @@ end
 
 local function EnemyPetUpdate()
 	TukuiPetBattleHUD_EnemyPet1:Hide()
-	local font, fontsize, fontflag
-	if ElvUI then
-		font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
-		normtex = A["media"].normTex
-	else
-		font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
-		if AsphyxiaUI then
-			if( A.client == "ruRU" ) then
-				font = C["media"]["pixelfont_ru"]
-				fontsize = 12
-			else
-				font = C["media"]["asphyxia"]
-				fontsize = 10
-			end
-		end
-		normtex = C["media"].normTex
-	end
 	for i = 1, 3 do
 		enemycustomName, enemyname = C_PetBattles.GetName(LE_BATTLE_PET_ENEMY, i)
 		enemypower = C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, i)
@@ -456,6 +438,7 @@ local function HUDSetupAuras(frame, owner, index)
 	_G[frame.."Debuff2"]:Hide()
 	_G[frame.."Debuff3"]:Hide()
 	for i = 1, 6 do
+		local id, name, icon, maxCooldown, description, auraID, instanceID, turnsRemaining, isBuff, casterOwner, casterIndex
 		auraID, instanceID, turnsRemaining, isBuff, casterOwner, casterIndex = C_PetBattles.GetAuraInfo(owner, index, i)
 		if auraID then id, name, icon, maxCooldown, description = C_PetBattles.GetAbilityInfoByID(auraID) else return end
 		if isBuff then
@@ -629,23 +612,6 @@ local function UpdateHud(self)
 	TukuiPetBattleHUD_EnemyPet3:SetPoint(point, TukuiPetBattleHUD_EnemyPet2, relativePoint, xcoord, ycoord)
 	if CheckOption("PBHShow") then TukuiPetBattleHUD_Pet1:Show() end
 	self:SetScript("OnUpdate", function()
-		local font, fontsize, fontflag
-		if ElvUI then
-			font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
-			normtex = A["media"].normTex
-		else
-			font, fontsize, fontflag = C["media"].pixelfont, 12, "MONOCHROMEOUTLINE"
-			if AsphyxiaUI then
-				if( A.client == "ruRU" ) then
-					font = C["media"]["pixelfont_ru"]
-					fontsize = 12
-				else
-					font = C["media"]["asphyxia"]
-					fontsize = 10
-				end
-			end
-			normtex = C["media"].normTex
-		end
 		for i = 1, 3 do
 			if C_PetBattles.IsInBattle() then
 				if not TukuiPetBattleHUDInit then PlayerPetUpdate() end
@@ -887,11 +853,75 @@ local function SetupPBH()
 	PetBattleHUDCombatDetect:SetScript("OnEvent", function(self, event)
 		if event == "PLAYER_REGEN_DISABLED" or InCombatLockdown() then
 			TukuiPetBattleHUD_Pet1:Hide()
+			ReviveBattlePetButton:Hide()
+			BandageBattlePetButton:Hide()
 		else
+			ReviveBattlePetButton:Show()
+			BandageBattlePetButton:Show()
 			if CheckOption("PBHShow") then
 				TukuiPetBattleHUD_Pet1:Show()
 			end
 		end
+	end)
+
+	local ReviveBattlePetButton = CreateFrame("Button", "ReviveBattlePetButton", UIParent, "SecureActionButtonTemplate")
+	ReviveBattlePetButton:Size(50)
+	ReviveBattlePetButton:SetMovable(true)
+	ReviveBattlePetButton:SetAttribute("type", "spell");
+	ReviveBattlePetButton:SetAttribute("spell", "Revive Battle Pets");
+	ReviveBattlePetButtonIcon = ReviveBattlePetButton:CreateTexture(nil, "MEDIUM")
+	ReviveBattlePetButton:SetTemplate("Default")
+	ReviveBattlePetButtonIcon:SetTexture(select(3, GetSpellInfo(125439)))
+	ReviveBattlePetButtonIcon:SetInside(ReviveBattlePetButton)
+	ReviveBattlePetButtonIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+	ReviveBattlePetButton:SetPoint("RIGHT", BossButton or TukuiExtraActionBarFrameHolder or AsphyxiaUIExtraActionBarFrameHolder, "CENTER", -3, 0)
+	ReviveBattlePetButtonCooldown = CreateFrame("Cooldown",nil, ReviveBattlePetButton)
+	ReviveBattlePetButtonCooldown:SetAllPoints(ReviveBattlePetButtonIcon)
+	ReviveBattlePetButton.LastUpdate = 0
+	ReviveBattlePetButton:SetScript("OnUpdate", function(self, elapsed)
+		self.LastUpdate = self.LastUpdate + elapsed
+		local start, duration = GetSpellCooldown(125439)
+			if duration and duration > 1.5 then
+				ReviveBattlePetButtonCooldown:SetCooldown(start, duration)
+			end
+		self.LastUpdate = 0
+		local petID = C_PetJournal.GetPetLoadOutInfo(1)
+		if petID == nil then return end
+		local hp1 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))
+		local hp2 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))
+		local hp3 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))
+		if not (hp1 == 0 or hp2 == 0 or hp3 == 0) then self:SetAlpha(0) self:EnableMouse(false) else self:SetAlpha(1) self:EnableMouse(true) end
+	end)
+
+	local BandageBattlePetButton = CreateFrame("Button", "BandageBattlePetButton", UIParent, "SecureActionButtonTemplate")
+	BandageBattlePetButton:Size(50)
+	BandageBattlePetButton:SetMovable(true)
+	BandageBattlePetButton:SetAttribute("type", "item");
+	BandageBattlePetButton:SetAttribute("item", "Battle Pet Bandage");
+	BandageBattlePetButtonIcon = BandageBattlePetButton:CreateTexture(nil, "MEDIUM")
+	BandageBattlePetButton:SetTemplate("Default")
+	BandageBattlePetButtonIcon:SetTexture(select(10, GetItemInfo(86143)))
+	BandageBattlePetButtonIcon:SetInside(BandageBattlePetButton)
+	BandageBattlePetButtonIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+	BandageBattlePetButtonText = BandageBattlePetButton:CreateFontString("BandageBattlePetButtonText", "OVERLAY")
+	BandageBattlePetButtonText:SetFont(font, fontsize, fontflag)
+	BandageBattlePetButtonText:SetPoint("BOTTOMRIGHT", BandageBattlePetButton, 0, 2)
+	local count = GetItemCount(86143)
+	if count ~= 0 then
+		BandageBattlePetButtonText:SetText(count)
+	end
+	BandageBattlePetButton:SetPoint("LEFT", BossButton or TukuiExtraActionBarFrameHolder or AsphyxiaUIExtraActionBarFrameHolder, "CENTER", 3, 0)
+	BandageBattlePetButton:SetScript("OnUpdate", function(self)
+		local petID = C_PetJournal.GetPetLoadOutInfo(1)
+		if petID == nil then return end
+		local hp1 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))
+		local hp2 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))
+		local hp3 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))
+		local count = GetItemCount(86143)
+		if count ~= 0 then
+			BandageBattlePetButtonText:SetText(count)
+		end
+		if not (hp1 == 0 or hp2 == 0 or hp3 == 0) or count == 0 then self:SetAlpha(0) self:EnableMouse(false) else self:SetAlpha(1) self:EnableMouse(true) end
 	end)
 
 	hooksecurefunc("PetBattleAuraHolder_Update", function(self)

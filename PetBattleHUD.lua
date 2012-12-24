@@ -2,7 +2,7 @@ local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
 local PBH = ElvUI and A:NewModule('PetBattleHUD','AceEvent-3.0')
 
 local font, fontsize, fontflag, border, offset, normtex
-local enemycustomName, enemyname, enemypower, enemyspeed, enemyxp, enemymaxXP, enemylevel, enemyicon, enemytype, enemyquality, enemyhp , enemymaxhp, enemyspeciesID
+local enemycustomName, enemyname, enemypower, enemyspeed, enemyxp, enemymaxXP, enemylevel, enemyicon, enemytype, enemyquality, enemyhp, enemymaxhp, enemyspeciesID
 
 if ElvUI then
 	font, fontsize, fontflag = A["media"].normFont, 12, "OUTLINE"
@@ -616,6 +616,7 @@ local function UpdateHud(self)
 			if C_PetBattles.IsInBattle() then
 				if not TukuiPetBattleHUDInit then PlayerPetUpdate() end
 				if not TukuiPetBattleEnemyHUDInit then EnemyPetUpdate() end
+				local oldenemy1power, oldenemy1speed, oldenemy2power, oldenemy2speed, oldenemy3power, oldenemy3speed
 				if not oldenemy1power then oldenemy1power = C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, 1) end
 				if not oldenemy1speed then oldenemy1speed = C_PetBattles.GetSpeed(LE_BATTLE_PET_ENEMY, 1) end
 				if not oldenemy2power then oldenemy2power = C_PetBattles.GetPower(LE_BATTLE_PET_ENEMY, 2) end

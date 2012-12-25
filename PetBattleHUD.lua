@@ -593,7 +593,7 @@ function PBHGetHighestQuality(enemyspeciesID)
 end
 
 local function UpdateHud(self)
-	print("|cffC495DDTukui|r & |cff1784d1ElvUI |rPet Battle HUD by |cffD38D01Azilroka|r - Version: |cff1784d1"..GetAddOnMetadata("PetBattleHUD", "Version"))
+	print("|cffC495DDTukui|r & |cff1784d1ElvUI |rPet Battle HUD by |cFFFF7D0AAzilroka|r - Version: |cff1784d1"..GetAddOnMetadata("PetBattleHUD", "Version").." Loaded!")
 	local point, relativePoint, xcoord, ycoord
 	if CheckOption("GrowUp") then
 		point = "BOTTOM"

@@ -161,8 +161,8 @@ local function CreateEnemyHUD(name, num)
 	frame.backdrop:CreateShadow()
 	frame:SetScript("OnShow", function()
 		local targetID = C_PetBattles.GetPetSpeciesID(LE_BATTLE_PET_ENEMY, num)
-		local ownedString = C_PetJournal.GetOwnedBattlePetString(targetID)
-		if not ownedString then
+		local owned = C_PetJournal.GetOwnedBattlePetString(targetID)
+		if owned == nil or owned == "Not Collected" then
 			frame.backdrop:SetBackdropBorderColor(1,0,0)
 		else
 			frame.backdrop:SetBackdropBorderColor(unpack(border))

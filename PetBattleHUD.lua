@@ -1,3 +1,4 @@
+if not (IsAddOnLoaded("Tukui") or IsAddOnLoaded("AsphyxiaUI") or IsAddOnLoaded("DuffedUI") or IsAddOnLoaded("ElvUI")) then return end
 local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
 local PBH = ElvUI and A:NewModule('PetBattleHUD','AceEvent-3.0')
 
@@ -593,7 +594,7 @@ function PBHGetHighestQuality(enemyspeciesID)
 end
 
 local function UpdateHud(self)
-	print("|cffC495DDTukui|r & |cff1784d1ElvUI |rPet Battle HUD by |cFFFF7D0AAzilroka|r - Version: |cff1784d1"..GetAddOnMetadata("PetBattleHUD", "Version").." Loaded!")
+	print("|cffC495DDTukui|r & |cff1784d1ElvUI |rPet Battle HUD by |cFFFF7D0AAzilroka|r - Version: |cff1784d1"..GetAddOnMetadata("PetBattleHUD", "Version").."|r Loaded!")
 	local point, relativePoint, xcoord, ycoord
 	if CheckOption("GrowUp") then
 		point = "BOTTOM"

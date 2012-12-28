@@ -1,4 +1,3 @@
-if not (IsAddOnLoaded("Tukui") or IsAddOnLoaded("AsphyxiaUI") or IsAddOnLoaded("DuffedUI") or IsAddOnLoaded("ElvUI")) then return end
 local A, C = unpack(Tukui or ElvUI or AsphyxiaUI or DuffedUI)
 local PBH = ElvUI and A:NewModule('PetBattleHUD','AceEvent-3.0')
 

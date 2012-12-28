@@ -1,4 +1,3 @@
-if not (IsAddOnLoaded("Tukui") or IsAddOnLoaded("AsphyxiaUI") or IsAddOnLoaded("DuffedUI") or IsAddOnLoaded("ElvUI")) then return end
 --Credits: Mike Zaitchik, Simca, Nullberri, Warla, and Ro 
 
 local CPB = _G.C_PetBattles

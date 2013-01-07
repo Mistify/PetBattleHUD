@@ -4,11 +4,11 @@ local PBH = ElvUI and A:NewModule('PetBattleHUD','AceEvent-3.0')
 local LSM
 
 local font, fontsize, fontflag, border, offset, normtex
-local enemycustomName, enemyname, enemypower, enemyspeed, enemyxp, enemymaxXP, enemylevel, enemyicon, enemytype, enemyquality, enemyhp, enemymaxhp, enemyspeciesID, oldpower, oldspeed
+local enemycustomName, enemyname, enemypower, enemyspeed, enemyxp, enemymaxXP, enemylevel, enemyicon, enemytype, enemyquality, enemyhp, enemymaxhp, enemyspeciesID
 
 if ElvUI then
 	LSM = LibStub("LibSharedMedia-3.0");
-	font, fontsize, fontflag = LSM:Fetch("font", A.private.general.normFont), 12, "OUTLINE"
+	font, fontsize, fontflag = LSM:Fetch("font", A.db.general.font), 12, "OUTLINE"
 	normtex = LSM:Fetch("statusbar", A.private.general.normTex)
 	border = A["media"]["bordercolor"]
 	offset = -1
@@ -108,9 +108,9 @@ local function CreatePlayerHUD(name, owner, num)
 		_G[name.."AtkPowerIconText"]:SetFont(font, fontsize, fontflag)
 		_G[name.."AtkSpeedIconText"]:SetFont(font, fontsize, fontflag)
 		_G[name.."NameText"]:SetTextColor(r, g, b)
+		_G[name.."NameText"]:SetText(customName or petname)
+		_G[name.."IconBackdropText"]:SetText(level)
 		if not C_PetBattles.IsInBattle() then
-			_G[name.."NameText"]:SetText(customName or petname)
-			_G[name.."IconBackdropText"]:SetText(level)
 			_G[name.."AtkPowerIconText"]:SetText(power)
 			_G[name.."AtkSpeedIconText"]:SetText(speed)
 			_G[name.."ExperienceText"]:SetText(xp.." / "..maxXp)
@@ -280,8 +280,8 @@ local function CreateEnemyHUD(name, owner, num)
 			_G[name.."Buff"..i]:Hide()
 			_G[name.."Debuff"..i]:Hide()
 		end
-		oldpower = nil
-		oldspeed = nil
+		self.oldpower = nil
+		self.oldspeed = nil
 	end)
 	frame:SetScript("OnUpdate", function(self)
 		enemycustomName, enemyname = C_PetBattles.GetName(owner, num)
@@ -337,28 +337,28 @@ local function CreateEnemyHUD(name, owner, num)
 		_G[name.."Debuff1Text"]:SetFont(font, 20, fontflag)
 		_G[name.."Debuff2Text"]:SetFont(font, 20, fontflag)
 		_G[name.."Debuff3Text"]:SetFont(font, 20, fontflag)
-		if not oldpower then oldpower = enemypower end
-		if not oldspeed then oldspeed = enemyspeed end
+		if not self.oldpower then self.oldpower = enemypower end
+		if not self.oldspeed then self.oldspeed = enemyspeed end
 		
 		HUDSetupAuras(name, owner, num)
 		
-		if C_PetBattles.GetPower(owner, num) > oldpower then
+		if C_PetBattles.GetPower(owner, num) > self.oldpower then
 			_G[name.."AtkPowerIconText"]:SetTextColor(0, 1, 0)
-		elseif C_PetBattles.GetPower(owner, num) < oldpower then
+		elseif C_PetBattles.GetPower(owner, num) < self.oldpower then
 			_G[name.."AtkPowerIconText"]:SetTextColor(1, 0, 0)
 		else
 			_G[name.."AtkPowerIconText"]:SetTextColor(1, 1, 1)
 		end
 		
-		if C_PetBattles.GetSpeed(owner, num) > oldspeed then
+		if C_PetBattles.GetSpeed(owner, num) > self.oldspeed then
 			_G[name.."AtkSpeedIconText"]:SetTextColor(0, 1, 0)
-		elseif C_PetBattles.GetSpeed(owner, num) < oldspeed then
+		elseif C_PetBattles.GetSpeed(owner, num) < self.oldspeed then
 			_G[name.."AtkSpeedIconText"]:SetTextColor(1, 0, 0)
 		else
 			_G[name.."AtkSpeedIconText"]:SetTextColor(1, 1, 1)
 		end
 		
-		if C_PetBattles.GetHealth(LE_BATTLE_PET_ENEMY, i) == 0 then
+		if C_PetBattles.GetHealth(owner, num) == 0 then
 			_G[name.."IconBackdropTexture"]:SetDesaturated(true)
 			_G[name.."IconBackdropTextureDead"]:Show()
 		else

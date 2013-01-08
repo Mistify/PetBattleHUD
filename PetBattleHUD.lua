@@ -4,7 +4,7 @@ local PBH = ElvUI and A:NewModule('PetBattleHUD','AceEvent-3.0')
 local LSM
 
 local font, fontsize, fontflag, border, offset, normtex
-local enemycustomName, enemyname, enemypower, enemyspeed, enemyxp, enemymaxXP, enemylevel, enemyicon, enemytype, enemyquality, enemyhp, enemymaxhp, enemyspeciesID
+
 
 if ElvUI then
 	LSM = LibStub("LibSharedMedia-3.0");
@@ -257,6 +257,7 @@ local function CreateEnemyHUD(name, owner, num)
 	frame.backdrop:CreateShadow()
 	frame:SetScript("OnShow", function()
 		local targetID = C_PetBattles.GetPetSpeciesID(owner, num)
+		local enemyquality = C_PetBattles.GetBreedQuality(owner, num)
 		local owned = C_PetJournal.GetOwnedBattlePetString(targetID)
 		if owned == nil or owned == "Not Collected" then
 			frame.backdrop:SetBackdropBorderColor(1,0,0)
@@ -265,6 +266,8 @@ local function CreateEnemyHUD(name, owner, num)
 			if C_PetBattles.IsWildBattle(owner, num) then
 				local ownedquality = PBHGetHighestQuality(targetID)
 				if ownedquality ~= -1 then
+					if ownedquality == nil then print("Owned Quality Breaking. Report issue to Azilroka.") return end
+					if enemyquality == nil then print("Enemy Quality Breaking. Report issue to Azilroka.") return end
 					if ownedquality < enemyquality then
 						frame.backdrop:SetBackdropBorderColor(1,0.35,0)
 					end
@@ -284,6 +287,7 @@ local function CreateEnemyHUD(name, owner, num)
 		self.oldspeed = nil
 	end)
 	frame:SetScript("OnUpdate", function(self)
+		local enemycustomName, enemyname, enemypower, enemyspeed, enemyxp, enemymaxXP, enemylevel, enemyicon, enemytype, enemyquality, enemyhp, enemymaxhp, enemyspeciesID
 		enemycustomName, enemyname = C_PetBattles.GetName(owner, num)
 		enemypower = C_PetBattles.GetPower(owner, num)
 		enemyspeed = C_PetBattles.GetSpeed(owner, num)
@@ -705,8 +709,6 @@ local function UpdateHud(self)
 	
 	TukuiPetBattleHUD_EnemyPet2:SetPoint(point, TukuiPetBattleHUD_EnemyPet1, relativePoint, xcoord, ycoord)
 	TukuiPetBattleHUD_EnemyPet3:SetPoint(point, TukuiPetBattleHUD_EnemyPet2, relativePoint, xcoord, ycoord)
-	
-	if CheckOption("PBHShow") then ShowPBH() end
 end
 
 function HidePBH()
@@ -716,9 +718,15 @@ function HidePBH()
 end
 
 function ShowPBH()
-	TukuiPetBattleHUD_Pet1:Show()
-	TukuiPetBattleHUD_Pet2:Show()
-	TukuiPetBattleHUD_Pet3:Show()
+	for i = 1, 3 do
+		local petID = C_PetJournal.GetPetLoadOutInfo(i)
+		if petID == nil then return end
+		if CheckOption("PBHShow") or C_PetBattles.IsInBattle() then
+			if i == 1 then TukuiPetBattleHUD_Pet1:Show() end
+			if i == 2 then TukuiPetBattleHUD_Pet2:Show() end
+			if i == 3 then TukuiPetBattleHUD_Pet3:Show() end
+		end
+	end
 end
 
 local function SetupPBH()
@@ -791,13 +799,16 @@ local function SetupPBH()
 			end
 		end
 	end)
-
+	TukuiPetBattleHUD:SetScript("OnUpdate", ShowPBH)
+	
 	local function CreateExtraActionButton(name, spellname, spelltype, spellid)
 		local frame = CreateFrame("Button", name.."Button", UIParent, "SecureActionButtonTemplate")
 		frame:Size(50)
 		frame:SetAttribute("type", spelltype)
 		frame:SetAttribute(spelltype, spellname)
 		frame:SetTemplate("Default")
+		frame:SetAlpha(0)
+		frame:EnableMouse(false)
 		
 		local frameIcon = frame:CreateTexture(nil, "MEDIUM")
 		if spelltype == "spell" then
@@ -811,7 +822,6 @@ local function SetupPBH()
 		local frameCooldown = CreateFrame("Cooldown", nil, frame)
 		frameCooldown:SetAllPoints(frameIcon)
 		frame.LastUpdate = 0
-		
 		frame:SetScript("OnUpdate", function(self, elapsed)
 			self.LastUpdate = self.LastUpdate + elapsed
 			local start, duration = GetSpellCooldown(spellid)
@@ -819,11 +829,13 @@ local function SetupPBH()
 				frameCooldown:SetCooldown(start, duration)
 			end
 			self.LastUpdate = 0
+			if C_PetBattles.IsInBattle() then return end
 			local petID = C_PetJournal.GetPetLoadOutInfo(1)
 			if petID == nil then return end
-			local hp1 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))
-			local hp2 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2))
-			local hp3 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3))
+			local hp1, hp2, hp3
+			hp1 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))
+			if C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2)) ~= nil then hp2 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2)) else hp2 = 1 end
+			if C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2)) ~= nil then hp3 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3)) else hp3 = 1 end
 			if not (hp1 == 0 or hp2 == 0 or hp3 == 0) then self:SetAlpha(0) self:EnableMouse(false) else self:SetAlpha(1) self:EnableMouse(true) end
 		end)
 	end

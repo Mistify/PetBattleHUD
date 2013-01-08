@@ -194,6 +194,7 @@ local function CreatePlayerHUD(name, owner, num)
 	_G[name.."Health"]:Size(width-110, 11)
 	_G[name.."Health"]:SetFrameLevel(TukuiPetBattleHUD_Pet1:GetFrameLevel() + 2)
 	_G[name.."Health"]:CreateBackdrop()
+	_G[name.."Health"].backdrop:SetBackdropColor(0,0,0,0)
 	_G[name.."HealthText"] = _G[name.."Health"]:CreateFontString(nil, "OVERLAY")
 	_G[name.."HealthText"]:SetPoint("TOP", 0, (1+offset))
 	_G[name.."AtkPowerIcon"] = frame:CreateTexture(nil, "OVERLAY")
@@ -210,6 +211,7 @@ local function CreatePlayerHUD(name, owner, num)
 	_G[name.."Experience"]:Size(width-110, 11)
 	_G[name.."Experience"]:SetFrameLevel(frame:GetFrameLevel() + 2)
 	_G[name.."Experience"]:CreateBackdrop()
+	_G[name.."Experience"].backdrop:SetBackdropColor(0,0,0,0)
 	_G[name.."ExperienceText"] = _G[name.."Experience"]:CreateFontString(nil, "OVERLAY")
 	_G[name.."ExperienceText"]:SetPoint("TOP", 0, (1+offset))
 	_G[name.."AtkSpeedIcon"] = frame:CreateTexture(_G[name.."AtkSpeedIcon"], "OVERLAY")
@@ -300,17 +302,6 @@ local function CreateEnemyHUD(name, owner, num)
 		enemymaxhp = C_PetBattles.GetMaxHealth(owner, num)
 		enemyspeciesID = C_PetBattles.GetPetSpeciesID(owner, num)
 		local er, eg, eb = GetItemQualityColor(enemyquality-1)
-		local enemyframes = C_PetBattles.GetNumPets(owner)
-		if enemyframes == 1 then
-			TukuiPetBattleHUD_EnemyPet1:Show()
-		elseif enemyframes == 2 then
-			TukuiPetBattleHUD_EnemyPet1:Show()
-			TukuiPetBattleHUD_EnemyPet2:Show()
-		elseif enemyframes == 3 then
-			TukuiPetBattleHUD_EnemyPet1:Show()
-			TukuiPetBattleHUD_EnemyPet2:Show()
-			TukuiPetBattleHUD_EnemyPet3:Show()
-		end
 		_G[name.."NameText"]:SetFont(font, fontsize, fontflag)
 		_G[name.."NameText"]:SetText(enemycustomName or enemyname)
 		_G[name.."NameText"]:SetTextColor(er, eg, eb)
@@ -469,6 +460,7 @@ local function CreateEnemyHUD(name, owner, num)
 	_G[name.."Health"]:Size(width-110, 11)
 	_G[name.."Health"]:SetFrameLevel(frame:GetFrameLevel() + 2)
 	_G[name.."Health"]:CreateBackdrop()
+	_G[name.."Health"].backdrop:SetBackdropColor(0,0,0,0)
 	_G[name.."Health"]:SetReverseFill(true)
 	_G[name.."HealthText"] = _G[name.."Health"]:CreateFontString(nil, "OVERLAY")
 	_G[name.."HealthText"]:SetPoint("TOP", 0, (1+offset))
@@ -486,6 +478,7 @@ local function CreateEnemyHUD(name, owner, num)
 	_G[name.."Experience"]:Size(width-110, 11)
 	_G[name.."Experience"]:SetFrameLevel(frame:GetFrameLevel() + 2)
 	_G[name.."Experience"]:CreateBackdrop()
+	_G[name.."Experience"].backdrop:SetBackdropColor(0,0,0,0)
 	_G[name.."Experience"]:SetReverseFill(true)
 	_G[name.."ExperienceText"] = _G[name.."Experience"]:CreateFontString(nil, "OVERLAY")
 	_G[name.."ExperienceText"]:SetPoint("TOP", 0, (1+offset))
@@ -721,10 +714,20 @@ function ShowPBH()
 	for i = 1, 3 do
 		local petID = C_PetJournal.GetPetLoadOutInfo(i)
 		if petID == nil then return end
-		if CheckOption("PBHShow") or C_PetBattles.IsInBattle() then
+		if CheckOption("PBHShow") then
 			if i == 1 then TukuiPetBattleHUD_Pet1:Show() end
 			if i == 2 then TukuiPetBattleHUD_Pet2:Show() end
 			if i == 3 then TukuiPetBattleHUD_Pet3:Show() end
+		end
+	end
+	if C_PetBattles.IsInBattle() then
+		local allyframes = C_PetBattles.GetNumPets(LE_BATTLE_PET_ALLY)
+		for i = 1, allyframes do
+			_G["TukuiPetBattleHUD_Pet"..i]:Show()
+		end
+		local enemyframes = C_PetBattles.GetNumPets(LE_BATTLE_PET_ENEMY)
+		for i = 1, enemyframes do
+			_G["TukuiPetBattleHUD_EnemyPet"..i]:Show()
 		end
 	end
 end

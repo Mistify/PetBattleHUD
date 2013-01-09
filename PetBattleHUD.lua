@@ -838,7 +838,7 @@ local function SetupPBH()
 			local hp1, hp2, hp3
 			hp1 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(1))
 			if C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2)) ~= nil then hp2 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2)) else hp2 = 1 end
-			if C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(2)) ~= nil then hp3 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3)) else hp3 = 1 end
+			if C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3)) ~= nil then hp3 = C_PetJournal.GetPetStats(C_PetJournal.GetPetLoadOutInfo(3)) else hp3 = 1 end
 			if not (hp1 == 0 or hp2 == 0 or hp3 == 0) then self:SetAlpha(0) self:EnableMouse(false) else self:SetAlpha(1) self:EnableMouse(true) end
 		end)
 	end
